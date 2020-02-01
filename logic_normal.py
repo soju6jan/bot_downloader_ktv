@@ -103,7 +103,7 @@ class LogicNormal(object):
     @staticmethod
     def scheduler_function():
         try:
-            logger.debug('%s scheduler_function', package_name)
+            #logger.debug('%s scheduler_function', package_name)
             last_id = ModelSetting.get_int('last_id')
 
             except_program = ModelSetting.get('except_program')
@@ -141,7 +141,7 @@ class LogicNormal(object):
                 query = db.session.query(ModelBotDownloaderKtvItem)
                 query = query.filter(or_(*condition))
 
-                logger.debug(query)
+                #logger.debug(query)
                 items = query.all()
 
             # 하나씩 판단....
