@@ -111,6 +111,7 @@ def ajax(sub):
                 Logic.scheduler_stop()
             return jsonify(go)
         elif sub == 'reset_db':
+            LogicNormal.reset_last_index()
             ret = Logic.reset_db()
             return jsonify(ret)
         elif sub == 'one_execute':

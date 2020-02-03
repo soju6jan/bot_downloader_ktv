@@ -12,7 +12,6 @@ from sqlalchemy.orm import backref
 
 # sjva 공용
 from framework import app, db, path_app_root
-from framework.logger import get_logger
 
 
 # 패키지
