@@ -163,9 +163,6 @@ class Logic(object):
     def migration():
         try:
             db_version = ModelSetting.get('db_version')
-            logger.debug('XXXXXXXXXXXXXXXXXXX')
-            logger.debug(db_version)
-            #ModelSetting.set('db_version', '2')
             if db_version is None:
                 import sqlite3
                 db_file = os.path.join(path_app_root, 'data', 'db', '%s.db' % package_name)
