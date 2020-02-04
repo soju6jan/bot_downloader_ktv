@@ -78,6 +78,9 @@ def first_menu(sub):
         arg['package_name']  = package_name
         arg['scheduler'] = str(scheduler.is_include(package_name))
         arg['is_running'] = str(scheduler.is_running(package_name))
+        from system.model import ModelSetting as SystemModelSetting
+        ddns = SystemModelSetting.get('ddns')
+        arg['rss_api'] = '%s/%s/api/rss' % (ddns, package_name)
         return render_template('%s_setting.html' % package_name, sub=sub, arg=arg)
     elif sub == 'list':
         arg = {'package_name' : package_name}
@@ -123,6 +126,12 @@ def ajax(sub):
             return jsonify(ret)
         elif sub == 'list':
             ret = LogicNormal.filelist(request)
+            ret['plex_server_hash'] = None
+            try:
+                import plex
+                ret['plex_server_hash'] = plex.Logic.get_server_hash()
+            except Exception, e:
+                logger.error('not import plex')
             return jsonify(ret)
         elif sub == 'add_program':
             ret = LogicNormal.add_program(request)
@@ -166,6 +175,19 @@ def api(sub):
         if sub == 'add_download':
             ret = LogicNormal.add_download_api(request)
             return jsonify(ret)
+        elif sub == 'rss':
+            ret = LogicNormal.itemlist_by_api(request)
+            data = []
+            for t in ret:
+                item = {}
+                item['title'] = t.filename
+                item['link'] = t.magnet
+                item['created_time'] = t.created_time
+                data.append(item)
+            from framework.common.rss import RssUtil
+            xml = RssUtil.make_rss(package_name, data)
+            return Response(xml, mimetype='application/xml')
+
     except Exception as e: 
         logger.error('Exception:%s', e)
         logger.error(traceback.format_exc())

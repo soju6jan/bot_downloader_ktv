@@ -626,45 +626,94 @@ class LogicNormal(object):
                 page = int(req.form['page'])
             if 'search_word' in req.form:
                 search = req.form['search_word']
-            query = db.session.query(ModelBotDownloaderKtvItem)
-            
-            if search != '':
-                query = query.filter(or_(ModelBotDownloaderKtvItem.filename.like('%'+search+'%'), ModelBotDownloaderKtvItem.daum_title == search))
-                #query = query.join(rss.ModelBbsBot).filter(ModelDownloaderKtv.feed_id == rss.ModelBbsBot.id) \
-                #.filter(rss.ModelBbsBot.daum_title.like('%'+search+'%'))
             option = req.form['option']
-            if option == 'request_True':
-                query = query.filter(ModelBotDownloaderKtvItem.download_status.like('True%'))
-            elif option == 'request_False':
-                query = query.filter(ModelBotDownloaderKtvItem.download_status.like('False%'))
-            elif option == 'by_plex_on':
-                query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
-            elif option == 'by_plex_off':
-                query = query.filter(ModelBotDownloaderKtvItem.plex_key == None)
-            elif option == 'by_plex_episode_off':
-                query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
-                query = query.filter(not_(ModelBotDownloaderKtvItem.plex_key.like('E%')))
-            
-
             order = req.form['order'] if 'order' in req.form else 'desc'
-            if order == 'desc':
-                query = query.order_by(desc(ModelBotDownloaderKtvItem.id))
-            else:
-                query = query.order_by(ModelBotDownloaderKtvItem.id)
+
+            query = LogicNormal.make_query(search, option, order)
             count = query.count()
             query = query.limit(page_size).offset((page-1)*page_size)
             logger.debug('ModelBotDownloaderKtvItem count:%s', count)
             lists = query.all()
             ret['list'] = [item.as_dict() for item in lists]
             ret['paging'] = Util.get_paging_info(count, page, page_size)
-            ret['plex_server_hash'] = None
-            try:
-                import plex
-                ret['plex_server_hash'] = plex.Logic.get_server_hash()
-            except Exception, e:
-                logger.error('not import plex')
             return ret
         except Exception, e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
 
+    
+    @staticmethod
+    def make_query(search, option, order, genre=None):
+        query = db.session.query(ModelBotDownloaderKtvItem)
+        if search is not None and search != '':
+            if search.find('|') != -1:
+                tmp = search.split('|')
+                conditions = []
+                for tt in tmp:
+                    if tt != '':
+                        conditions.append(ModelBotDownloaderKtvItem.filename.like('%'+tt.strip()+'%') )
+                query = query.filter(or_(*conditions))
+            elif search.find(',') != -1:
+                tmp = search.split(',')
+                for tt in tmp:
+                    if tt != '':
+                        query = query.filter(ModelBotDownloaderKtvItem.filename.like('%'+tt.strip()+'%'))
+            else:
+                query = query.filter(or_(ModelBotDownloaderKtvItem.filename.like('%'+search+'%'), ModelBotDownloaderKtvItem.daum_title == search))
+
+        if genre is not None and genre != '':
+            if genre.find('|') != -1:
+                tmp = genre.split('|')
+                conditions = []
+                for tt in tmp:
+                    if tt != '':
+                        conditions.append(ModelBotDownloaderKtvItem.daum_genre.like('%'+tt.strip()+'%') )
+                query = query.filter(or_(*conditions))
+            elif genre.find(',') != -1:
+                tmp = genre.split(',')
+                for tt in tmp:
+                    if tt != '':
+                        query = query.filter(ModelBotDownloaderKtvItem.daum_genre.like('%'+tt.strip()+'%'))
+            else:
+                query = query.filter(or_(ModelBotDownloaderKtvItem.daum_genre.like('%'+genre+'%'), ModelBotDownloaderKtvItem.daum_genre == genre))
+
+        
+        if option == 'request_True':
+            query = query.filter(ModelBotDownloaderKtvItem.download_status.like('True%'))
+        elif option == 'request_False':
+            query = query.filter(ModelBotDownloaderKtvItem.download_status.like('False%'))
+        elif option == 'by_plex_on':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
+        elif option == 'by_plex_off':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key == None)
+        elif option == 'by_plex_episode_off':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
+            query = query.filter(not_(ModelBotDownloaderKtvItem.plex_key.like('E%')))
+        if order == 'desc':
+            query = query.order_by(desc(ModelBotDownloaderKtvItem.id))
+        else:
+            query = query.order_by(ModelBotDownloaderKtvItem.id)
+
+        return query
+
+
+            
+    @staticmethod
+    def itemlist_by_api(req):
+        try:
+
+            search = req.args.get('search')
+            logger.debug(search)
+            option = req.args.get('option')
+            order = 'desc'
+            genre = req.args.get('genre')
+            count = req.args.get('count')
+            if count is None or count == '':
+                count = 100
+            query = LogicNormal.make_query(search, option, order, genre=genre)
+            query = query.limit(count)
+            lists = query.all()
+            return lists
+        except Exception, e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())

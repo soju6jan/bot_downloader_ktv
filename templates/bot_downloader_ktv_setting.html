@@ -62,6 +62,9 @@
         {{ macros.setting_button([['global_one_execute_btn', '1회 실행']], left='1회 실행' ) }}
         {{ macros.setting_button([['global_reset_db_btn', '목록 전체 지우기']], left='DB정리' ) }}
         {{ macros.info_text_and_buttons('last_id', '마지막 ID', [['reset_last_index_btn', 'ID 초기화']], value='마지막 ID : ' + arg['last_id'], desc=['DB에 저장된 Index를 지웁니다', '최초 시작처럼 7일 이내 데이터를 모두 처리합니다.']) }}
+        {{ macros.m_hr() }}
+        {{ macros.info_text_go('rss_api', 'RSS API', value=arg['rss_api'], desc=['파라미터', ' - search : 파일명 키워드. 연산자 지원', ' - genre : 장르. 연산자 지원', '- count : 피드 수. 기본값 100', '- option : 생략가능. 값 : request_True, request_False, by_plex_on, by_plex_off, by_plex_episode_off', '', '연산자', '- AND 연산자 : 구분자 ,', '- OR연산자 : 구분자 |', '', '자세한 설정은 플러그인 설치 게시물 참고']) }}
+
       {{ macros.m_tab_content_end() }}  
     </div><!--tab-content-->
     </form>
