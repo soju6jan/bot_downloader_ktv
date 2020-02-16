@@ -356,15 +356,15 @@ function make_list(data) {
     tmp += m_button('self_search_btn', '목록 검색', [{'key':'id', 'value':data[i].daum_title}]);
     tmp += m_button('plex_refresh_btn', 'PLEX 정보 새로고침', [{'key':'id', 'value':data[i].id}]);
     tmp += m_button('remove_btn', '삭제', [{'key':'id', 'value':data[i].id}]);
-    tmp += m_button('add_download_btn', '다운로드 추가', [{'key':'id', 'value':data[i].id}]);
+    tmp += m_button('global_downloader_add_btn', '다운로드 추가', [{'key':'id', 'value':data[i].id}]);
     tmp2 = m_button_group(tmp)
 
     tmp = m_button('except_program_btn', '제외프로그램 추가', [{'key':'id', 'value':data[i].daum_title}]);
     tmp += m_button('whitelist_program_btn', '포함프로그램 추가', [{'key':'id', 'value':data[i].daum_title}]);
     
     
-    tmp += m_button('global_add_remote_btn', 'Offcloud 추가', [{'key':'hash', 'value':data[i].magnet}]);
-    tmp += m_button('global_cache_confirm_btn', 'Offcloud 캐쉬', [{'key':'hash', 'value':data[i].magnet}]);
+    tmp += m_button('global_downloader_add_btn', 'Offcloud 추가', [{'key':'hash', 'value':data[i].magnet}]);
+    tmp += m_button('global_offcloud_cache_confirm_btn', 'Offcloud 캐쉬', [{'key':'hash', 'value':data[i].magnet}]);
     if (is_torrent_info_installed) {
       tmp += m_button('torrent_info_btn', 'Torrent Info', [{'key':'hash', 'value':data[i].magnet}]);
     }
