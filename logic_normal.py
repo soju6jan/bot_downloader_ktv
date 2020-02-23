@@ -386,7 +386,7 @@ class LogicNormal(object):
             if condition_except_keyword != '' and condition_except_keyword is not None:
                 condition_except_keywords = [x.strip().replace(' ', '').strip() for x in condition_except_keyword.replace('\n', '|').split('|')]
                 condition_except_keywords = Util.get_list_except_empty(condition_except_keywords)
-                for t in condition_except_keyword:
+                for t in condition_except_keywords:
                     if item.filename.find(t) != -1:
                         item.download_status = 'False_match_condition_except_keyword'    
                         item.log += u'\n단어 제외 조건. 다운:Off. 조건:%s' % t
