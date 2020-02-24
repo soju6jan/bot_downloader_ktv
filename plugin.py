@@ -11,7 +11,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 
 # sjva 공용
 from framework.logger import get_logger
-from framework import app, db, scheduler, path_data, socketio, my_login_required
+from framework import app, db, scheduler, path_data, socketio, check_api
 from framework.util import Util
 from system.logic import SystemLogic
 from framework.common.torrent.process import TorrentProcess
@@ -99,6 +99,7 @@ def first_menu(sub):
 # For UI 
 #########################################################
 @blueprint.route('/ajax/<sub>', methods=['GET', 'POST'])
+@login_required
 def ajax(sub):
     try:
         # 설정 저장
@@ -170,6 +171,7 @@ def ajax(sub):
 # API
 #########################################################
 @blueprint.route('/api/<sub>', methods=['GET', 'POST'])
+@check_api
 def api(sub):
     try:
         if sub == 'add_download':
