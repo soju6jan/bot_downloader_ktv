@@ -93,7 +93,7 @@ class Logic(object):
         try:
             logger.debug('%s scheduler_start' % package_name)
             job = Job(package_name, package_name, ModelSetting.get('interval'), Logic.scheduler_function, u"Bot 다운로드 - TV", False)
-            scheduler.add_job_instance(job)
+            scheduler.add_job_instance(job) 
         except Exception as e: 
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
