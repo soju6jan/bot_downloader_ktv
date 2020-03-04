@@ -14,8 +14,8 @@ from sqlalchemy import or_, and_, func, not_
 from framework import app, db, scheduler, path_app_root
 from framework.job import Job
 from framework.util import Util
-from system.logic import SystemLogic
 from framework.common.torrent.process import TorrentProcess
+from system.model import ModelSetting as SystemModelSetting
 
 # 패키지
 from .plugin import logger, package_name
@@ -42,7 +42,11 @@ class LogicNormal(object):
                         if ret.daum_poster_url is not None:
                             TelegramHandle.sendMessage(ret.daum_poster_url, mime='photo')
                             pass
-                        url = '%s/%s/api/add_download?url=%s' % (SystemLogic.get_setting_value('ddns'), package_name, ret.magnet)
+                        
+                        url = '%s/%s/api/add_download?url=%s' % (SystemModelSetting.get('ddns'), package_name, ret.magnet)
+                        if SystemModelSetting.get_bool('auth_use_apikey'):
+                            url += '&apikey=%s' % SystemModelSetting.get('auth_apikey')
+
                         msg += '\n➕ 다운로드 추가\n%s\n' % url
                         try:
                             if ret.daum_id is not None:
@@ -479,7 +483,7 @@ class LogicNormal(object):
 
             telegram_log += '결과 : %s\n' % status_str
             telegram_log += '파일명 : %s\n' % item.filename
-            telegram_log += '%s/%s/list\n' % (SystemLogic.get_setting_value('ddns'), package_name)
+            telegram_log += '%s/%s/list\n' % (SystemModelSetting.get('ddns'), package_name)
             #telegram_log += item.download_status + '\n'
             telegram_log += '로그\n' + item.log
 
