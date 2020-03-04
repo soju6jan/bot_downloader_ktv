@@ -15,6 +15,7 @@ from framework import app, db, scheduler, path_data, socketio, check_api
 from framework.util import Util
 from system.logic import SystemLogic
 from framework.common.torrent.process import TorrentProcess
+from system.model import ModelSetting as SystemModelSetting
 
 # 패키지
 # 로그
@@ -81,6 +82,9 @@ def first_menu(sub):
         from system.model import ModelSetting as SystemModelSetting
         ddns = SystemModelSetting.get('ddns')
         arg['rss_api'] = '%s/%s/api/rss' % (ddns, package_name)
+        if SystemModelSetting.get_bool('auth_use_apikey'):
+            arg['rss_api'] += '?apikey=%s' % SystemModelSetting.get('auth_apikey')
+        
         return render_template('%s_setting.html' % package_name, sub=sub, arg=arg)
     elif sub == 'list':
         arg = {'package_name' : package_name}
