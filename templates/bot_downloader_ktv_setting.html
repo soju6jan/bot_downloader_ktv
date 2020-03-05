@@ -37,11 +37,11 @@
         </div>
         {{ macros.setting_radio('download_mode', '다운로드 모드', ['블랙리스트', '화이트리스트'], value=arg['download_mode']) }}
         <div id="blacklist_div" class="collapse">
-          {{ macros.setting_input_text('except_genre', '제외 장르', value=arg['except_genre'], desc=['지정한 장르는 다운로드 하지 않습니다. 빈칸인 경우 모두 다운로드', '구분자 |']) }}
+          {{ macros.setting_input_text('except_genre', '제외 장르', value=arg['except_genre'], desc=['지정한 장르는 다운로드 하지 않습니다. 빈칸인 경우 검사하지 않습니다.', '구분자 |']) }}
           {{ macros.setting_input_textarea('except_program', '제외 프로그램', value=arg['except_program'], desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드 하지 않습니다.', '구분자 |']) }}
         </div>
         <div id="whitelist_div" class="collapse">
-          {{ macros.setting_input_text('whitelist_genre', '포함 장르', value=arg['whitelist_genre'], desc=['지정한 장르는 모두 다운로드합니다. 빈칸인 경우 모두 다운로드. 구분자 |']) }}
+          {{ macros.setting_input_text('whitelist_genre', '포함 장르', value=arg['whitelist_genre'], desc=['지정한 장르는 모두 다운로드합니다. 빈칸인 경우 검사하지 않습니다. 구분자 |']) }}
           {{ macros.setting_input_textarea('whitelist_program', '포함 프로그램', value=arg['whitelist_program'], desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드합니다. 구분자 |']) }}
           {{ macros.setting_checkbox('whitelist_first_episode_download', '첫회 받기', value=arg['whitelist_first_episode_download'], desc='On : 포함 프로그램에 방송이 없어도 첫 에피소드를 다운로드합니다.') }}
         </div>
