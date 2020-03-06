@@ -28,7 +28,7 @@ class LogicNormal(object):
     def process_telegram_data(data):
         try:
             ret = ModelBotDownloaderKtvItem.process_telegram_data(data)
-            logger.debug(ret)
+            #logger.debug(ret)
             if ret is not None:
                 if ModelSetting.get_bool('receive_info_send_telegram'):
                     from telegram_bot import TelegramHandle
