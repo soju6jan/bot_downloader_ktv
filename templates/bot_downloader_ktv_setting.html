@@ -26,8 +26,8 @@
 
         {{ macros.setting_radio('torrent_program', '토렌트 프로그램', ['Transmission', 'DownloadStation'], value=arg['torrent_program']) }}
         {{ macros.setting_input_text('path', '다운로드 경로', value=arg['path'], desc='토렌트 프로그램에 맞는 경로를 입력해야 합니다.') }}
-        {{ macros.setting_checkbox('receive_info_send_telegram', '정보 수신시 텔레그램', value=arg['receive_info_send_telegram'], desc=['On: 토렌트 정보 수신한 내용을 텔레그램으로 발송합니다.']) }}
-        {{ macros.setting_checkbox('download_start_send_telegram', '다운 시작시 텔레그램', value=arg['download_start_send_telegram'], desc=['On: 조건에 의해 다운로드가 시작되면 텔레그램으로 알려줍니다.']) }}
+        {{ macros.setting_checkbox('receive_info_send_telegram', '정보 수신시 알림', value=arg['receive_info_send_telegram'], desc=['ID : bot_downloader_ktv_receive']) }}
+        {{ macros.setting_checkbox('download_start_send_telegram', '처리 결과 알림', value=arg['download_start_send_telegram'], desc=['ID : bot_downloader_ktv_result']) }}
       {{ macros.m_tab_content_end() }}
 
       {{ macros.m_tab_content_start('condition', false) }}

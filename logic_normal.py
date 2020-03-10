@@ -39,10 +39,6 @@ class LogicNormal(object):
                         msg += '중복 마그넷입니다.'
                         #TelegramHandle.sendMessage(msg)
                     else:
-                        if ret.daum_poster_url is not None:
-                            TelegramHandle.sendMessage(ret.daum_poster_url, mime='photo')
-                            pass
-                        
                         url = '%s/%s/api/add_download?url=%s' % (SystemModelSetting.get('ddns'), package_name, ret.magnet)
                         if SystemModelSetting.get_bool('auth_use_apikey'):
                             url += '&apikey=%s' % SystemModelSetting.get('auth_apikey')
@@ -56,9 +52,8 @@ class LogicNormal(object):
                         except Exception as e: 
                             logger.error('Exception:%s', e)
                             logger.error(traceback.format_exc())  
-                
-                    TelegramHandle.sendMessage(msg)
-
+                    import framework.common.notify as Notify
+                    Notify.send_message(msg, image_url=ret.daum_poster_url, message_id='bot_downloader_ktv_receive')
                 LogicNormal.invoke()
                 TorrentProcess.receive_new_data(ret, package_name)
         except Exception, e:
@@ -430,7 +425,6 @@ class LogicNormal(object):
     @staticmethod
     def send_telegram_message(item):
         try:
-            import telegram_bot
             telegram_log = '😉 봇 다운로드 - TV\n'
             telegram_log += '정보 : %s (%s), %s회, %s\n' % (item.daum_title, item.daum_genre, item.filename_number, item.filename_date)
             
@@ -487,7 +481,8 @@ class LogicNormal(object):
             #telegram_log += item.download_status + '\n'
             telegram_log += '로그\n' + item.log
 
-            telegram_bot.TelegramHandle.sendMessage(telegram_log)
+            import framework.common.notify as Notify
+            Notify.send_message(telegram_log, message_id='bot_downloader_ktv_result')
 
         except Exception as e: 
             logger.error('Exception:%s', e)
