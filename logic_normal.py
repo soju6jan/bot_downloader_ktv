@@ -41,7 +41,7 @@ class LogicNormal(object):
                         if SystemModelSetting.get_bool('auth_use_apikey'):
                             url += '&apikey=%s' % SystemModelSetting.get('auth_apikey')
 
-                        msg += '\n➕ 다운로드 추가\n%s\n' % url
+                        msg += '\n➕ 다운로드 추가\n<%s>\n' % url
                         try:
                             if ret.daum_id is not None:
                                 #url = 'https://search.daum.net/search?w=tv&q=%s&irk=%s&irt=tv-program&DA=TVP' % (urllib.quote(daum_tv.Logic.get_search_name_from_original(ret.file_name).encode('utf8')), ret.daum_id)
