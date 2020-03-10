@@ -31,8 +31,6 @@ class LogicNormal(object):
             #logger.debug(ret)
             if ret is not None:
                 if ModelSetting.get_bool('receive_info_send_telegram'):
-                    from telegram_bot import TelegramHandle
-
                     msg = '😉 TV 정보 수신\n'
                     msg += '제목 : %s\n' % data['filename']
                     if ret is None:
