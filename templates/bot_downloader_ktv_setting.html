@@ -24,7 +24,7 @@
         {{ macros.setting_radio('telegram_invoke_action', '텔레그램 수신시', ['실행하지 않음', '스케쥴링 중에만 실행', '스케쥴링 상태가 아니더라도 실행'], value=arg['telegram_invoke_action']) }}
         {{ macros.setting_input_int('delay_time', '판단 지연 시간', value=arg['delay_time'], min='1', placeholder='10', desc=['설정된 시간만큼 다운로드 여부 판단을 지연합니다.', 'VOD 기능을 같이 사용하는 분들을 위한 기능으로 동일 에피소드가 VOD보다 토렌트가 먼저 배포될 경우 토렌트를 받지 않고자 할때 사용합니다.', '0 : 위 텔레그램 수신시 설정한 옵션에 따라 바로 실행됩니다.', '그외 : 수신된 시간 + 설정시간 < 현재시간 인 경우 다운여부 판단', 'minute 단위' ]) }}
 
-        {{ macros.setting_radio('torrent_program', '토렌트 프로그램', ['Transmission', 'DownloadStation'], value=arg['torrent_program']) }}
+        {{ macros.setting_radio('torrent_program', '토렌트 프로그램', ['트랜스미션', '다운로드 스테이션', '큐빗토렌트', 'aria2'], value=arg['torrent_program']) }}
         {{ macros.setting_input_text('path', '다운로드 경로', value=arg['path'], desc='토렌트 프로그램에 맞는 경로를 입력해야 합니다.') }}
         {{ macros.setting_checkbox('receive_info_send_telegram', '정보 수신시 알림', value=arg['receive_info_send_telegram'], desc=['ID : bot_downloader_ktv_receive']) }}
         {{ macros.setting_checkbox('download_start_send_telegram', '처리 결과 알림', value=arg['download_start_send_telegram'], desc=['ID : bot_downloader_ktv_result']) }}
