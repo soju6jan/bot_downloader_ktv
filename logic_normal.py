@@ -46,7 +46,6 @@ class LogicNormal(object):
                             msg += '\n➕ 다운로드 추가\n<%s>\n' % url
                         try:
                             if ret.daum_id is not None:
-                                #url = 'https://search.daum.net/search?w=tv&q=%s&irk=%s&irt=tv-program&DA=TVP' % (urllib.quote(daum_tv.Logic.get_search_name_from_original(ret.file_name).encode('utf8')), ret.daum_id)
                                 url = 'https://search.daum.net/search?w=tv&q=%s&irk=%s&irt=tv-program&DA=TVP' % (urllib.quote(ret.daum_title.encode('utf8')), ret.daum_id)
                                 msg += '\n● Daum 정보\n%s' % url
                         except Exception as e: 
