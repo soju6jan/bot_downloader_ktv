@@ -149,36 +149,53 @@ class LogicNormal(object):
                     item.downloader_item_id = None
                     item.log = ''
                     logger.debug('title:%s daum:%s date:%s no:%s', item.daum_title, item.daum_id, item.filename_date, item.filename_number) 
-                    
-                    if item.daum_genre is None:
-                        item.download_status = 'False_no_meta'
+                    option_auto_download = ModelSetting.get('option_auto_download')
+
+                    if option_auto_download == '0':
+                        item.download_status = 'no'
                     else:
-                        LogicNormal.search_plex_data(item)
-                        # PLEX
-                        if ModelSetting.get_bool('use_plex_data'):
-                            flag_download = LogicNormal.condition_check_plex(item)
+                        if item.daum_genre is None:
+                            item.download_status = 'False_no_meta'
+                        else:
+                            LogicNormal.search_plex_data(item)
+                            # PLEX
+                            if ModelSetting.get_bool('use_plex_data'):
+                                flag_download = LogicNormal.condition_check_plex(item)
 
-                        if not flag_download and not item.download_status.startswith('False'):
-                            flag_download = LogicNormal.condition_check_download_mode(item, except_genres, whitelist_genres, except_programs, whitelist_programs)
+                            if not flag_download and not item.download_status.startswith('False'):
+                                flag_download = LogicNormal.condition_check_download_mode(item, except_genres, whitelist_genres, except_programs, whitelist_programs)
 
-                        if flag_download:
-                            flag_download = LogicNormal.condition_check_duplicate(item)
+                            if flag_download:
+                                flag_download = LogicNormal.condition_check_duplicate(item)
 
-                        if flag_download:
-                            flag_download = LogicNormal.condition_check_filename(item)
+                            if flag_download:
+                                flag_download = LogicNormal.condition_check_filename(item)
 
-                        if flag_download:
-                            flag_download = LogicNormal.condition_check_delay(item)
+                            if flag_download:
+                                flag_download = LogicNormal.condition_check_delay(item)
 
-                        #다운로드
-                        if flag_download:
-                            import downloader
-                            logger.debug(u'다운로드 요청')
-                            downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='')['downloader_item_id']
-                            item.downloader_item_id = downloader_item_id
-                        
-                        if ModelSetting.get_bool('download_start_send_telegram'):
-                            LogicNormal.send_telegram_message(item)
+                            #다운로드
+                            if flag_download:
+                                if option_auto_download == '1':
+                                    import downloader
+                                    logger.debug(u'다운로드 요청')
+                                    downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='')['downloader_item_id']
+                                    item.downloader_item_id = downloader_item_id
+                                else:
+                                    item.download_status = 'True_only_status'
+                            else:
+                                if option_auto_download == '1':
+                                    item.download_status = 'False'
+                                else:
+                                    item.download_status = 'False_only_status'
+                                    
+                            if ModelSetting.get_bool('download_start_send_telegram'):
+                                flag_notify = True
+                                if ModelSetting.get_bool('download_start_send_telegram_only_true'):
+                                    if item.download_status != 'True':
+                                        flag_notify = False
+                                if flag_notify:
+                                    LogicNormal.send_telegram_message(item)
                     item.download_check_time =  datetime.datetime.now()                         
                     db.session.add(item)
                 except Exception as e: 
@@ -310,7 +327,8 @@ class LogicNormal(object):
             query = query.filter( \
                 ModelBotDownloaderKtvItem.daum_id == item.daum_id, \
                 ModelBotDownloaderKtvItem.filename_number == item.filename_number, \
-                ModelBotDownloaderKtvItem.filename_date == item.filename_date)
+                ModelBotDownloaderKtvItem.filename_date == item.filename_date, \
+                ModelBotDownloaderKtvItem.id < item.id)
                 # 20-01-31
                 # 지연.. 이 후 1080 받음.. 이전데이터는 없기 때문에 받아버림.
                 #ModelBotDownloaderKtvItem.id < item.id)
@@ -322,7 +340,8 @@ class LogicNormal(object):
                 item.log += '\n중복 에피소드 DB에 있음. count:%s' % len(lists)
             if condition_duplicate_download == '0':
                 for tmp in lists:
-                    if tmp.downloader_item_id is not None:
+                    #if tmp.downloader_item_id is not None:
+                    if tmp.download_status.startswith('True'):
                         item.download_status = 'False_not_allow_duplicate_episode'
                         item.log += u'\n이미 받은 에피소드가 있음. 다운:Off'
                         return False
@@ -331,7 +350,8 @@ class LogicNormal(object):
             elif condition_duplicate_download == '2':
                 download_quality_list = []
                 for tmp in lists:
-                    if tmp.downloader_item_id is not None:
+                    #if tmp.downloader_item_id is not None:
+                    if tmp.download_status.startswith('True'):
                         if tmp.filename_quality not in download_quality_list:
                             download_quality_list.append(tmp.filename_quality)
 

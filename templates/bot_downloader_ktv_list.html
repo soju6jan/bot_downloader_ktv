@@ -248,6 +248,9 @@ function make_list(data) {
     } else {
       tmp = '판단 이전 '
     }
+    if (data[i].download_status.indexOf('only_status') !== -1) {
+      tmp += ' 조건만'
+    }
 
     if (data[i].plex_key != null) {
       if (data[i].plex_key.startsWith('/')) {

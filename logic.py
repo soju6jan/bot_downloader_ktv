@@ -49,7 +49,10 @@ class Logic(object):
         'condition_except_keyword' : '', 
         'last_id' : '-1', 
         'db_version' : '2', 
-        'delay_time' : '0'
+        'delay_time' : '0',
+        'option_auto_download' : '1',
+        'receive_dulicate_option' : 'True',
+        'download_start_send_telegram_only_true' : 'False',
 
     }
 

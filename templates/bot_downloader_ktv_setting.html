@@ -28,9 +28,14 @@
         {{ macros.setting_input_text('path', '다운로드 경로', value=arg['path'], desc='토렌트 프로그램에 맞는 경로를 입력해야 합니다.') }}
         {{ macros.setting_checkbox('receive_info_send_telegram', '정보 수신시 알림', value=arg['receive_info_send_telegram'], desc=['ID : bot_downloader_ktv_receive']) }}
         {{ macros.setting_checkbox('download_start_send_telegram', '처리 결과 알림', value=arg['download_start_send_telegram'], desc=['ID : bot_downloader_ktv_result']) }}
+        <div id="download_start_send_telegram_div" class="collapse">
+        {{ macros.setting_checkbox('download_start_send_telegram_only_true', '다운로드 요청 건만 알림', value=arg['download_start_send_telegram_only_true'], desc=['On : 실제 다운로드 요청한 건만 알림을 받습니다.']) }}
+        </div>
       {{ macros.m_tab_content_end() }}
 
       {{ macros.m_tab_content_start('condition', false) }}
+        {{ macros.setting_radio('option_auto_download', '자동 다운로드', ['사용 안함(정보만 수신)', '자동 다운로드', '다운로드 조건만 체크하여 표시. Offcloud 등 타앱에서 RSS로 사용시'], value=arg['option_auto_download']) }}
+        {{ macros.m_hr() }}
         {{ macros.setting_checkbox('use_plex_data', 'Plex 연동', value=arg['use_plex_data'], desc=['On : Plex와 연동하여 다운여부를 판단합니다.', '1. 라이브러리에 있는 방송. 다운로드 모드와 무관', ' - 비어 있는 에피소드 : 자동 다운로드', ' - 이미 있는 에피소드 : 다운로드 안함', '2. 라이브러리에 없는 방송 : 다운로드 모드의 설정에 따라 결정']) }}
         <div id="use_plex_data_div" class="collapse">
           {{ macros.setting_checkbox('one_episode_multifile', '에피소드 파일 중복 허용', value=arg['one_episode_multifile'], desc='On : 이미 에피소드 파일이 있더라도 다시 받습니다.') }}
@@ -56,7 +61,6 @@
         <div id="use_wait_1080_div" class="collapse">
           {{ macros.setting_input_int('use_wait_1080_time', '판단 지연 시간', value=arg['use_wait_1080_time'], desc=['이 시간 후에는 화질에 상관없이 조건에 맞으면 다운로드를 시작합니다.', 'minute 단위']) }}
         </div>
-
       {{ macros.m_tab_content_end() }}
       {{ macros.m_tab_content_start('action', false) }}
         {{ macros.setting_button([['global_one_execute_btn', '1회 실행']], left='1회 실행' ) }}
@@ -75,11 +79,17 @@ var package_name = "{{arg['package_name'] }}";
 var current_data = null;
 var download_mode = "{{arg['download_mode']}}";
 var telegram_invoke_action = "{{arg['telegram_invoke_action']}}"
+var option_auto_download = "{{arg['option_auto_download']}}"
+
 $(document).ready(function(){
   // 로딩
   set_download_mode(download_mode);
   use_collapse("use_plex_data");
   use_collapse("use_wait_1080");
+  use_collapse("download_start_send_telegram");
+  if (parseInt(option_auto_download)>= 1) {
+    $('#option_auto_download_div').collapse('show')
+  }
 });
 
 
@@ -94,7 +104,16 @@ $('#use_plex_data').change(function() {
 $('#use_wait_1080').change(function() {
   use_collapse('use_wait_1080');
 });
-
+$('#download_start_send_telegram').change(function() {
+  use_collapse('download_start_send_telegram');
+});
+$('input[type=radio][name=option_auto_download]').change(function() {
+  if (this.value == 0) {
+    $('#option_auto_download_div').collapse('hide')
+  } else {
+    $('#option_auto_download_div').collapse('show')
+  }
+});
 
 function set_download_mode(type) {
   $('input[name=download_mode]')[parseInt(type)].checked = true;
