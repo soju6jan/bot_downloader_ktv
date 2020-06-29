@@ -165,6 +165,11 @@ def ajax(sub):
             except Exception as e: 
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
+        # 봇 검색
+        elif sub == 'make_etc_genre':
+            return jsonify(ModelBotDownloaderKtvItem.make_etc_genre())
+
+
     except Exception as e: 
         logger.error('Exception:%s', e)
         logger.error(traceback.format_exc())  

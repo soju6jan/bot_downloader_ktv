@@ -204,9 +204,26 @@ class ModelBotDownloaderKtvItem(db.Model):
                 entity.daum_id = data['daum']['daum_id']
                 entity.daum_title = data['daum']['title']
                 entity.daum_poster_url = data['daum']['poster_url']
+            else:
+                entity.daum_genre = u'미분류'
             db.session.add(entity)
             db.session.commit()
             return entity
         except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())   
+
+    @staticmethod
+    def make_etc_genre():
+        try:
+            items = db.session.query(ModelBotDownloaderKtvItem).filter(ModelBotDownloaderKtvItem.daum_genre == None).with_for_update().all()
+            logger.debug('Empty genre len :%s', len(items))
+            for item in items:
+                item.daum_genre = u'미분류'
+            db.session.commit()
+            return True
+        except Exception as e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())   
+        return False
+        
