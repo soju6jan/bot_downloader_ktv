@@ -128,16 +128,12 @@ class LogicNormal(object):
                 items = query.all()
             else:
                 condition = []
-
-                condition.append( and_(ModelBotDownloaderKtvItem.id > last_id, ModelBotDownloaderKtvItem.created_time + datetime.timedelta(minutes=ModelSetting.get_int('delay_time')) < datetime.datetime.now() ))
-                #condition.append( and_(ModelBotDownloaderKtvItem.id > last_id ))
-
+                tmp = datetime.datetime.now() - datetime.timedelta(minutes=ModelSetting.get_int('delay_time'))
+                #condition.append( and_(ModelBotDownloaderKtvItem.id > last_id, (ModelBotDownloaderKtvItem.created_time + datetime.timedelta(minutes=ModelSetting.get_int('delay_time'))) < datetime.datetime.now() ))
+                condition.append( and_( ModelBotDownloaderKtvItem.id > last_id, ModelBotDownloaderKtvItem.created_time < tmp ))
                 condition.append( and_(ModelBotDownloaderKtvItem.download_status.like('Delay'), ModelBotDownloaderKtvItem.delay_time < datetime.datetime.now() ))
-
                 query = db.session.query(ModelBotDownloaderKtvItem)
                 query = query.filter(or_(*condition))
-
-                #logger.debug(query)
                 items = query.all()
 
             # 하나씩 판단....
@@ -173,6 +169,8 @@ class LogicNormal(object):
 
                             if flag_download:
                                 flag_download = LogicNormal.condition_check_delay(item)
+                                if flag_download == False and item.download_status == 'Delay':
+                                    continue
 
                             #다운로드
                             if flag_download:
@@ -348,6 +346,9 @@ class LogicNormal(object):
                 item.log += u'\n이미 받은 에피소드가 없음. 다운:On'
                 return True
             elif condition_duplicate_download == '2':
+                if item.filename_quality == '':
+                    item.log += u'\n화질 정보 없어서 판단하지 않음.'
+                    return True
                 download_quality_list = []
                 for tmp in lists:
                     #if tmp.downloader_item_id is not None:
@@ -421,9 +422,13 @@ class LogicNormal(object):
     @staticmethod
     def condition_check_delay(item):
         try:
+            logger.debug('XXXXXXXXXXXXXXXXXXXXXXXX')
             if ModelSetting.get_bool('use_wait_1080'):
+                logger.debug('AAAAAAAAAAAAAAAAAA')
                 if item.filename_quality != '1080':
+                    logger.debug('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
                     if item.created_time + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time')) > datetime.datetime.now():
+                        logger.debug('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
                         item.download_status = 'Delay'
                         #item.delay_time = datetime.datetime.now() + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time'))
                         item.delay_time = item.created_time + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time'))
