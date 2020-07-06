@@ -422,13 +422,9 @@ class LogicNormal(object):
     @staticmethod
     def condition_check_delay(item):
         try:
-            logger.debug('XXXXXXXXXXXXXXXXXXXXXXXX')
             if ModelSetting.get_bool('use_wait_1080'):
-                logger.debug('AAAAAAAAAAAAAAAAAA')
                 if item.filename_quality != '1080':
-                    logger.debug('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
                     if item.created_time + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time')) > datetime.datetime.now():
-                        logger.debug('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
                         item.download_status = 'Delay'
                         #item.delay_time = datetime.datetime.now() + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time'))
                         item.delay_time = item.created_time + datetime.timedelta(minutes=ModelSetting.get_int('use_wait_1080_time'))
