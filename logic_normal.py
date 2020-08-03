@@ -660,7 +660,7 @@ class LogicNormal(object):
 
     
     @staticmethod
-    def make_query(search, option, order, genre=None):
+    def make_query(search, option, order, genre=None, server_id_mod=None):
         query = db.session.query(ModelBotDownloaderKtvItem)
         if search is not None and search != '':
             if search.find('|') != -1:
@@ -711,6 +711,12 @@ class LogicNormal(object):
         else:
             query = query.order_by(ModelBotDownloaderKtvItem.id)
 
+        if server_id_mod is not None and server_id_mod != '':
+            tmp = server_id_mod.split('_')
+            if len(tmp) == 2:
+                query = query.filter(ModelBotDownloaderKtvItem.server_id % int(tmp[0]) == int(tmp[1]))
+
+
         return query
 
 
@@ -718,7 +724,6 @@ class LogicNormal(object):
     @staticmethod
     def itemlist_by_api(req):
         try:
-
             search = req.args.get('search')
             logger.debug(search)
             option = req.args.get('option')
@@ -727,7 +732,8 @@ class LogicNormal(object):
             count = req.args.get('count')
             if count is None or count == '':
                 count = 100
-            query = LogicNormal.make_query(search, option, order, genre=genre)
+            server_id_mod = req.args.get('server_id_mod')
+            query = LogicNormal.make_query(search, option, order, genre=genre, server_id_mod=server_id_mod)
             query = query.limit(count)
             lists = query.all()
             return lists

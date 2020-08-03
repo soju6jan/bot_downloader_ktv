@@ -187,6 +187,10 @@ class ModelBotDownloaderKtvItem(db.Model):
                     if entity.daum_genre == data['daum']['genre']:
                         # 같은 마그넷, 같은 장르라면 패스
                         return
+            # 2020-08-03 동일 파일명 수신하지 않음.
+            entity = db.session.query(ModelBotDownloaderKtvItem).filter_by(filename=data['filename']).first()
+            if entity is not None:
+                return
             entity =  ModelBotDownloaderKtvItem()
             entity.server_id = data['server_id']
             entity.data = data
