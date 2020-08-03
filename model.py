@@ -153,6 +153,8 @@ class ModelBotDownloaderKtvItem(db.Model):
     # 2 버전 추가
     log = db.Column(db.String)
 
+    # 3 버전 추가
+    server_id = db.Column(db.Integer)
 
     def __init__(self):
         self.created_time = datetime.now()
@@ -186,6 +188,7 @@ class ModelBotDownloaderKtvItem(db.Model):
                         # 같은 마그넷, 같은 장르라면 패스
                         return
             entity =  ModelBotDownloaderKtvItem()
+            entity.server_id = data['server_id']
             entity.data = data
 
             entity.filename = data['filename']
