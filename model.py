@@ -7,7 +7,7 @@ import json
 import os
 
 # third-party
-from sqlalchemy import or_, and_, func, not_
+from sqlalchemy import desc, or_, and_, func, not_
 from sqlalchemy.orm import backref
 
 # sjva 공용
