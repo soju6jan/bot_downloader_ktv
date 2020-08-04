@@ -233,4 +233,124 @@ class ModelBotDownloaderKtvItem(db.Model):
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())   
         return False
+
+    @staticmethod
+    def filelist(req):
+        try:
+            ret = {}
+            page = 1
+            page_size = ModelSetting.get_int('web_page_size')
+            job_id = ''
+            search = ''
+            if 'page' in req.form:
+                page = int(req.form['page'])
+            if 'search_word' in req.form:
+                search = req.form['search_word']
+            option = req.form['option']
+            order = req.form['order'] if 'order' in req.form else 'desc'
+
+            query = ModelBotDownloaderKtvItem.make_query(search, option, order)
+            count = query.count()
+            query = query.limit(page_size).offset((page-1)*page_size)
+            logger.debug('ModelBotDownloaderKtvItem count:%s', count)
+            lists = query.all()
+            ret['list'] = [item.as_dict() for item in lists]
+            ret['paging'] = Util.get_paging_info(count, page, page_size)
+            return ret
+        except Exception, e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+    
+    @staticmethod
+    def make_query(search, option, order, genre=None, server_id_mod=None):
+        query = db.session.query(ModelBotDownloaderKtvItem)
+        if search is not None and search != '':
+            if search.find('|') != -1:
+                tmp = search.split('|')
+                conditions = []
+                for tt in tmp:
+                    if tt != '':
+                        conditions.append(ModelBotDownloaderKtvItem.filename.like('%'+tt.strip()+'%') )
+                query = query.filter(or_(*conditions))
+            elif search.find(',') != -1:
+                tmp = search.split(',')
+                for tt in tmp:
+                    if tt != '':
+                        query = query.filter(ModelBotDownloaderKtvItem.filename.like('%'+tt.strip()+'%'))
+            else:
+                query = query.filter(or_(ModelBotDownloaderKtvItem.filename.like('%'+search+'%'), ModelBotDownloaderKtvItem.daum_title == search))
+
+        if genre is not None and genre != '':
+            if genre.find('|') != -1:
+                tmp = genre.split('|')
+                conditions = []
+                for tt in tmp:
+                    if tt != '':
+                        conditions.append(ModelBotDownloaderKtvItem.daum_genre.like('%'+tt.strip()+'%') )
+                query = query.filter(or_(*conditions))
+            elif genre.find(',') != -1:
+                tmp = genre.split(',')
+                for tt in tmp:
+                    if tt != '':
+                        query = query.filter(ModelBotDownloaderKtvItem.daum_genre.like('%'+tt.strip()+'%'))
+            else:
+                query = query.filter(or_(ModelBotDownloaderKtvItem.daum_genre.like('%'+genre+'%'), ModelBotDownloaderKtvItem.daum_genre == genre))
+
         
+        if option == 'request_True':
+            query = query.filter(ModelBotDownloaderKtvItem.download_status.like('True%'))
+        elif option == 'request_False':
+            query = query.filter(ModelBotDownloaderKtvItem.download_status.like('False%'))
+        elif option == 'by_plex_on':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
+        elif option == 'by_plex_off':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key == None)
+        elif option == 'by_plex_episode_off':
+            query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
+            query = query.filter(not_(ModelBotDownloaderKtvItem.plex_key.like('E%')))
+        if order == 'desc':
+            query = query.order_by(desc(ModelBotDownloaderKtvItem.id))
+        else:
+            query = query.order_by(ModelBotDownloaderKtvItem.id)
+
+        if server_id_mod is not None and server_id_mod != '':
+            tmp = server_id_mod.split('_')
+            if len(tmp) == 2:
+                query = query.filter(ModelBotDownloaderKtvItem.server_id % int(tmp[0]) == int(tmp[1]))
+
+
+        return query
+
+
+            
+    @staticmethod
+    def itemlist_by_api(req):
+        try:
+            search = req.args.get('search')
+            logger.debug(search)
+            option = req.args.get('option')
+            order = 'desc'
+            genre = req.args.get('genre')
+            count = req.args.get('count')
+            if count is None or count == '':
+                count = 100
+            server_id_mod = req.args.get('server_id_mod')
+            query = ModelBotDownloaderKtvItem.make_query(search, option, order, genre=genre, server_id_mod=server_id_mod)
+            query = query.limit(count)
+            lists = query.all()
+            return lists
+        except Exception, e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+
+    @staticmethod
+    def remove(db_id):
+        try:
+            entity = db.session.query(ModelBotDownloaderKtvItem).filter(ModelBotDownloaderKtvItem.id == db_id).first()
+            db.session.delete(entity)
+            db.session.commit()
+            return True
+        except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+            return False

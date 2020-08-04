@@ -130,7 +130,7 @@ def ajax(sub):
             ret = LogicNormal.reset_last_index()
             return jsonify(ret)
         elif sub == 'list':
-            ret = LogicNormal.filelist(request)
+            ret = ModelBotDownloaderKtvItem.filelist(request)
             ret['plex_server_hash'] = None
             try:
                 import plex
@@ -148,7 +148,7 @@ def ajax(sub):
             ret = LogicNormal.plex_refresh(request.form['id'])
             return jsonify(ret)
         elif sub == 'remove':
-            ret = LogicNormal.remove(request.form['id'])
+            ret = ModelBotDownloaderKtvItem.remove(request.form['id'])
             return jsonify(ret)
         
         # 봇 검색
@@ -165,7 +165,6 @@ def ajax(sub):
             except Exception as e: 
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
-        # 봇 검색
         elif sub == 'make_etc_genre':
             return jsonify(ModelBotDownloaderKtvItem.make_etc_genre())
 
@@ -187,7 +186,7 @@ def api(sub):
             ret = LogicNormal.add_download_api(request)
             return jsonify(ret)
         elif sub == 'rss':
-            ret = LogicNormal.itemlist_by_api(request)
+            ret = ModelBotDownloaderKtvItem.itemlist_by_api(request)
             data = []
             for t in ret:
                 item = {}
