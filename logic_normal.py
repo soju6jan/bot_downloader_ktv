@@ -177,7 +177,7 @@ class LogicNormal(object):
                                 if option_auto_download == '1':
                                     import downloader
                                     logger.debug(u'다운로드 요청')
-                                    downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='')['downloader_item_id']
+                                    downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id=item.server_id)['downloader_item_id']
                                     item.downloader_item_id = downloader_item_id
                                 else:
                                     item.download_status = 'True_only_status'
