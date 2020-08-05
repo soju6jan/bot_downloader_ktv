@@ -167,8 +167,9 @@ def ajax(sub):
                 logger.error(traceback.format_exc())
         elif sub == 'make_etc_genre':
             return jsonify(ModelBotDownloaderKtvItem.make_etc_genre())
-
-
+        elif sub == 'share_copy':
+            ret = LogicNormal.share_copy(request)
+            return jsonify(ret)
     except Exception as e: 
         logger.error('Exception:%s', e)
         logger.error(traceback.format_exc())  

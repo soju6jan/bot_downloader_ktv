@@ -616,11 +616,30 @@ class LogicNormal(object):
             return 'fail'
 
 
-    
 
-    
+    @staticmethod
+    def share_copy(req):
+        try:
+            import downloader
+            db_id = req.form['id']
+            item = db.session.query(ModelBotDownloaderKtvItem).filter_by(id=db_id).with_for_update().first()
 
-
+            try:
+                from gd_share_client.logic_user import LogicUser
+            except:
+                return {'ret':'fail', 'log':u'구글 드라이브 공유 플러그인이 설치되어 있지 않습니다.'}
+            my_remote_path = ModelSetting.get('remote_path')
+            if my_remote_path == '':
+                return {'ret':'fail', 'log':u'리모트 경로가 설정되어 있지 않습니다.'}
+            
+            # 백그라운드
+            ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
+            item.download_status = 'True_manual_gd_%s' % item.download_status
+            db.session.commit()
+            return {'ret':'success'}
+        except Exception as e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
     
 
     

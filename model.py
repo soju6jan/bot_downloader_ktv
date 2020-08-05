@@ -156,6 +156,9 @@ class ModelBotDownloaderKtvItem(db.Model):
 
     # 3 버전 추가
     server_id = db.Column(db.Integer)
+    
+    # 3 버전 추가
+    folderid = db.Column(db.String)
 
     def __init__(self):
         self.created_time = datetime.now()
@@ -361,9 +364,12 @@ class ModelBotDownloaderKtvItem(db.Model):
         try:
             query = db.session.query(ModelBotDownloaderKtvItem).filter(ModelBotDownloaderKtvItem.server_id == int(data['server_id']))
             query = query.filter(ModelBotDownloaderKtvItem.magnet.like('%'+ data['magnet_hash']))
-            entity = query.first()
-            logger.debug('3333333333333333333333333')
-            logger.debug(entity)
+            entity = query.with_for_update().first()
+            
+            if entity is not None:
+                logger.debug(entity)
+                entity.folderid = data['folderid']
+                db.session.commit()
             return True
         except Exception as e: 
             logger.error('Exception:%s', e)
