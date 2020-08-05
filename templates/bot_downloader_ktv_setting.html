@@ -37,6 +37,8 @@
       {{ macros.m_tab_content_start('condition', false) }}
         {{ macros.setting_radio('option_auto_download', '자동 다운로드', ['사용 안함(정보만 수신)', '자동 다운로드', '다운로드 조건만 체크하여 표시. Offcloud 등 타앱에서 RSS로 사용시'], value=arg['option_auto_download']) }}
         {{ macros.m_hr() }}
+        {{ macros.setting_radio('share_receive_option', '구드공 데이터 수신시', ['Nothing', '모두 다운로드', '다운로드 조건만 체크 옵션일 경우 조건에 일치하면 다운로드', '자동 다운로드 조건이며 지연시간 이전이면 바로 판단'], value=arg['share_receive_option']) }}
+        {{ macros.m_hr() }}
         {{ macros.setting_checkbox('use_plex_data', 'Plex 연동', value=arg['use_plex_data'], desc=['On : Plex와 연동하여 다운여부를 판단합니다.', '1. 라이브러리에 있는 방송. 다운로드 모드와 무관', ' - 비어 있는 에피소드 : 자동 다운로드', ' - 이미 있는 에피소드 : 다운로드 안함', '2. 라이브러리에 없는 방송 : 다운로드 모드의 설정에 따라 결정']) }}
         <div id="use_plex_data_div" class="collapse">
           {{ macros.setting_checkbox('one_episode_multifile', '에피소드 파일 중복 허용', value=arg['one_episode_multifile'], desc='On : 이미 에피소드 파일이 있더라도 다시 받습니다.') }}

@@ -56,7 +56,7 @@ class Logic(object):
         'download_start_send_telegram_only_true' : 'False',
         # 구드공 연동
         'remote_path' : '',
-        'share_option' : '',
+        'share_receive_option' : '0',
 
     }
 
