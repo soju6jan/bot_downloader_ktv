@@ -333,9 +333,9 @@ function make_list(data) {
         tmp += ', ' + data[i].filename_number + '회'
       }
       tmp += ', ' + data[i].filename_date
-      if (data[i].folderid != null) {
-        tmp += '&nbsp;&nbsp;<span style="font-weight:bold; color:red;">구글 드라이브 공유 가능</span>';
-      }
+      //if (data[i].folderid != null) {
+      //  tmp += '&nbsp;&nbsp;<span style="font-weight:bold; color:red;">구글 드라이브 공유 가능</span>';
+      //}
     } else {
       tmp += '<br><b>방송 : </b>검색 실패'
     }
@@ -365,7 +365,13 @@ function make_list(data) {
     tmp = data[i].created_time + ' (텔레그램 수신)'
     if (data[i].download_check_time != null) {
       tmp += '<br>' + data[i].download_check_time + ' (다운여부 판단)'
-    } 
+    }
+    if (data[i].folderid_time != null) {
+      tmp += '<br>' + data[i].folderid_time + ' (구드공 수신)'
+    }
+    if (data[i].share_copy_time != null) {
+      tmp += '<br>' + data[i].share_copy_time + ' (구드공 요청)'
+    }
     if (data[i].downloader_item != null) {
       tmp += '<br>' + data[i].downloader_item.created_time + ' (다운로드 요청)'
       if (data[i].downloader_item.completed_time != '') {
@@ -387,7 +393,7 @@ function make_list(data) {
     //tmp += m_button('global_downloader_add_btn', '다운로드 추가', [{'key':'hash', 'value':data[i].magnet}]);
     tmp += m_button('add_download_btn', '다운로드 추가',  [{'key':'id', 'value':data[i].id}]);
     if (data[i].folderid != null) {
-      tmp += m_button('share_copy_btn', '구글 드라이브 공유 복사',  [{'key':'id', 'value':data[i].id}]);
+      tmp += m_button2('share_copy_btn', '구글 드라이브 공유 복사',  [{'key':'id', 'value':data[i].id}], 'danger');
     }
     tmp2 = m_button_group(tmp)
 

@@ -160,6 +160,11 @@ class ModelBotDownloaderKtvItem(db.Model):
     # 3 버전 추가
     folderid = db.Column(db.String)
 
+    # 4 버전 추가
+    folderid_time = db.Column(db.DateTime)
+    # 5 버전 추가
+    share_copy_time = db.Column(db.DateTime)
+
     def __init__(self):
         self.created_time = datetime.now()
         self.download_status = ''
@@ -173,9 +178,19 @@ class ModelBotDownloaderKtvItem(db.Model):
         ret['download_check_time'] = self.download_check_time.strftime('%m-%d %H:%M:%S') if self.download_check_time is not None  else None
         ret['delay_time'] = self.delay_time.strftime('%m-%d %H:%M:%S') if self.delay_time is not None  else None
         ret['downloader_item'] = self.downloader_item.as_dict() if self.downloader_item is not None else None
+        ret['folderid_time'] = self.folderid_time.strftime('%m-%d %H:%M:%S') if self.folderid_time is not None  else None
+        ret['share_copy_time'] = self.share_copy_time.strftime('%m-%d %H:%M:%S') if self.share_copy_time is not None  else None
         return ret
     
-    
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+
+
     @staticmethod
     def process_telegram_data(data):
         try:
@@ -369,9 +384,13 @@ class ModelBotDownloaderKtvItem(db.Model):
             if entity is not None:
                 logger.debug(entity)
                 entity.folderid = data['folderid']
+                entity.folderid_time = datetime.now()
                 db.session.commit()
+                from .logic_normal import LogicNormal
+                LogicNormal.process_gd(entity)
             return True
         except Exception as e: 
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
             return False
+    

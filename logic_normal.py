@@ -175,10 +175,19 @@ class LogicNormal(object):
                             #다운로드
                             if flag_download:
                                 if option_auto_download == '1':
-                                    import downloader
-                                    logger.debug(u'다운로드 요청')
-                                    downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
-                                    item.downloader_item_id = downloader_item_id
+                                    if item.folderid is not None and ModelSetting.get('share_receive_option') == '3':
+                                        try:
+                                            from gd_share_client.logic_user import LogicUser
+                                            ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=ModelSetting.get('remote_path'))
+                                            item.download_status = 'True_gdrive_share'
+                                            item.share_copy_time = datetime.datetime.now()
+                                        except:
+                                            pass
+                                    else:
+                                        import downloader
+                                        logger.debug(u'다운로드 요청')
+                                        downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
+                                        item.downloader_item_id = downloader_item_id
                                 else:
                                     item.download_status = 'True_only_status'
                             else:
@@ -634,7 +643,8 @@ class LogicNormal(object):
             
             # 백그라운드
             ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
-            item.download_status = 'True_manual_gd_%s' % item.download_status
+            item.download_status = 'True_manual_gdrive_share'
+            item.share_copy_time = datetime.datetime.now()
             db.session.commit()
             return {'ret':'success'}
         except Exception as e:
@@ -643,4 +653,29 @@ class LogicNormal(object):
     
 
     
-    
+    @staticmethod
+    def process_gd(item):
+        try:
+            #{{ macros.setting_radio('share_receive_option', '구드공 데이터 활용', ['Nothing', '다운로드 조건에 상관없이 모두 다운로드', '다운로드 조건만 체크 옵션일 경우 조건에 일치하면 즉시 다운로드', '자동 자동로드 모드. 지연시간 이후 다운로드 시도시 구드공 데이터가 있을 경우 구드공으로 다운로드'], value=arg['share_receive_option']) }}
+            share_receive_option = ModelSetting.get('share_receive_option')
+            if share_receive_option == '0':
+                pass
+            try:
+                from gd_share_client.logic_user import LogicUser
+            except:
+                return
+            my_remote_path = ModelSetting.get('remote_path')
+            if share_receive_option == '1':
+                ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
+                item.download_status = 'True_gdrive_share'
+                item.share_copy_time = datetime.datetime.now()
+                item.save()
+            elif share_receive_option == '2':
+                if item.download_status == 'True_only_status':
+                    ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
+                    item.download_status = 'True_gdrive_share'
+                    item.share_copy_time = datetime.datetime.now()
+                    item.save()
+        except Exception as e:
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())

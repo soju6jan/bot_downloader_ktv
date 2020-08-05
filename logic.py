@@ -21,7 +21,7 @@ from .logic_normal import LogicNormal
 
 class Logic(object):
     db_default = {
-        'db_version' : '4', 
+        'db_version' : '6', 
         'interval' : '30',
         'auto_start' : 'False',
         'web_page_size': '20',
@@ -236,6 +236,26 @@ class Logic(object):
                 cursor.execute(query)
                 connection.close()
                 ModelSetting.set('db_version', '4')
+                db.session.flush()
+            if ModelSetting.get('db_version') == '4':
+                import sqlite3
+                db_file = os.path.join(path_app_root, 'data', 'db', '%s.db' % package_name)
+                connection = sqlite3.connect(db_file)
+                cursor = connection.cursor()
+                query = 'ALTER TABLE %s_item ADD folderid_time DATETIME' % (package_name)
+                cursor.execute(query)
+                connection.close()
+                ModelSetting.set('db_version', '5')
+                db.session.flush()
+            if ModelSetting.get('db_version') == '5':
+                import sqlite3
+                db_file = os.path.join(path_app_root, 'data', 'db', '%s.db' % package_name)
+                connection = sqlite3.connect(db_file)
+                cursor = connection.cursor()
+                query = 'ALTER TABLE %s_item ADD share_copy_time DATETIME' % (package_name)
+                cursor.execute(query)
+                connection.close()
+                ModelSetting.set('db_version', '6')
                 db.session.flush()
         except Exception as e:
             logger.error('Exception:%s', e)
