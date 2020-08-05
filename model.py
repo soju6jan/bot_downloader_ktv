@@ -355,3 +355,17 @@ class ModelBotDownloaderKtvItem(db.Model):
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
             return False
+
+    @staticmethod
+    def receive_share_data(data):
+        try:
+            query = db.session.query(ModelBotDownloaderKtvItem).filter(ModelBotDownloaderKtvItem.server_id == int(data['server_id']))
+            query = query.filter(ModelBotDownloaderKtvItem.magnet.like('%'+ data['magnet_hash']))
+            entity = query.first()
+            logger.debug('3333333333333333333333333')
+            logger.debug(entity)
+            return True
+        except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+            return False
