@@ -322,6 +322,8 @@ function make_list(data) {
       tmp += '단어 포함 조건'
     } else if (data[i].download_status == 'False_match_condition_except_keyword') {
       tmp += '단어 제외 조건'
+    } else if (data[i].download_status == 'True_gdrive_share') {
+      tmp += '구글 드라이브 공유'
     } else {
       tmp += data[i].download_status
     }
