@@ -5,6 +5,7 @@ import os
 import datetime
 import traceback
 import urllib
+import time
 
 # third-party
 from sqlalchemy import desc
@@ -665,17 +666,21 @@ class LogicNormal(object):
             except:
                 return
             my_remote_path = ModelSetting.get('remote_path')
+            # 2020-08-10 너무 빨리 호출되면 rclone 탐색이 실패하는건가?
             if share_receive_option == '1':
+                time.sleep(60)
                 ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
                 item.download_status = 'True_gdrive_share'
                 item.share_copy_time = datetime.datetime.now()
                 item.save()
             elif share_receive_option == '2':
                 if item.download_status == 'True_only_status':
+                    time.sleep(60)
                     ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path)
                     item.download_status = 'True_gdrive_share'
                     item.share_copy_time = datetime.datetime.now()
                     item.save()
+            logger.debug('Folderid:%s', item.folderid)
         except Exception as e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
