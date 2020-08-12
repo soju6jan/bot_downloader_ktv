@@ -149,7 +149,7 @@ $("body").on('click', '#share_copy_btn', function(e) {
     dataType: "json",
     success: function (data) {
       if (data.ret == 'success') {
-        command_modal_show('');
+        //command_modal_show('');
       } else {
         $.notify('<strong>'+data.log+'</strong>', {
           type: 'warning'

@@ -172,7 +172,8 @@ class LogicNormal(object):
                                 flag_download = LogicNormal.condition_check_delay(item)
                                 if flag_download == False and item.download_status == 'Delay':
                                     continue
-
+                            if flag_download:
+                                flag_download = LogicNormal.condition_check_server_id_mod(item)
                             #다운로드
                             if flag_download:
                                 if option_auto_download == '1':
@@ -446,7 +447,30 @@ class LogicNormal(object):
             logger.error(traceback.format_exc())
         return flag_download
 
+
+    @staticmethod
+    def condition_check_server_id_mod(item):
+        try:
+            server_id_mod = ModelSetting.get('condition_server_id_mod')
+            if server_id_mod == '':
+                return True
+            else:
+                tmp = server_id_mod.split('_')
+                if item.server_id % int(tmp[0]) == int(tmp[1]):
+                    item.log += u'\nserver_id_mod 조건 일치. 다운:on. server_id:%s 조건:%s' % (item.server_id, server_id_mod)
+                    return True
+                else:
+                    item.download_status = 'False_server_id_mod'  
+                    item.log += u'\nserver_id_mod 조건 불일치. 다운:Off. server_id:%s 조건:%s' % (item.server_id, server_id_mod)
+                    return False
+        except Exception as e: 
+            logger.error('Exception:%s', e)
+            logger.error(traceback.format_exc())
+        return True
+
+
     
+
 
 
 

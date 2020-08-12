@@ -382,7 +382,7 @@ class ModelBotDownloaderKtvItem(db.Model):
             entity = query.with_for_update().first()
             
             if entity is not None:
-                logger.debug(entity)
+                #logger.debug(entity)
                 entity.folderid = data['folderid']
                 entity.folderid_time = datetime.now()
                 db.session.commit()

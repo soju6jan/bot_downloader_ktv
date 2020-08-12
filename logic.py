@@ -57,6 +57,7 @@ class Logic(object):
         # 구드공 연동
         'remote_path' : '',
         'share_receive_option' : '0',
+        'condition_server_id_mod' : '', 
 
     }
 
