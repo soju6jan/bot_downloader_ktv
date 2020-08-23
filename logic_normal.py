@@ -188,7 +188,7 @@ class LogicNormal(object):
                                     else:
                                         import downloader
                                         logger.debug(u'다운로드 요청')
-                                        downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
+                                        downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='ktv_%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
                                         item.downloader_item_id = downloader_item_id
                                 else:
                                     item.download_status = 'True_only_status'
