@@ -583,7 +583,7 @@ class LogicNormal(object):
             import downloader
             db_id = req.form['id']
             item = db.session.query(ModelBotDownloaderKtvItem).filter_by(id=db_id).with_for_update().first()
-            downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
+            downloader_item_id = downloader.Logic.add_download2(item.magnet, ModelSetting.get('torrent_program'), ModelSetting.get('path'), request_type=package_name, request_sub_type='', server_id='ktv_%s_%s_%s' % (item.server_id, item.file_count, item.total_size))['downloader_item_id']
             item.downloader_item_id = downloader_item_id
             item.download_status = 'True_manual_%s' % item.download_status
             db.session.commit()
