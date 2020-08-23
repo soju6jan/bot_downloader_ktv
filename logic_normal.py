@@ -210,6 +210,8 @@ class LogicNormal(object):
                 except Exception as e: 
                     logger.error('Exception:%s', e)
                     logger.error(traceback.format_exc())
+                finally:
+                    logger.debug('item status : %s', item.download_status)
 
             new_last_id = last_id
             if flag_first and len(items) == 0:
@@ -295,8 +297,8 @@ class LogicNormal(object):
                             break
             else:
                 flag_download = False
-                logger.debug(whitelist_genres)
-                logger.debug(item.daum_genre)
+                #logger.debug(whitelist_genres)
+                #logger.debug(item.daum_genre)
                 if len(whitelist_genres) > 0 and item.daum_genre in whitelist_genres:
                     flag_download = True
                     item.download_status = 'True_whitelist_genre'
@@ -305,7 +307,7 @@ class LogicNormal(object):
                     item.download_status = 'False_whitelist'
                     item.log += u'화이트리스트 모드. 다운:Off'
                     for program_name in whitelist_programs:
-                        if item.daum_title.replace(' ', '').find(program_name) != -1:
+                        if item.daum_title is not None and item.daum_title.replace(' ', '').find(program_name) != -1:
                             item.download_status = 'True_whitelist_program'
                             flag_download = True
                             item.log += u'포함 프로그램. 다운:On'
@@ -336,8 +338,8 @@ class LogicNormal(object):
             query = query.filter( \
                 ModelBotDownloaderKtvItem.daum_id == item.daum_id, \
                 ModelBotDownloaderKtvItem.filename_number == item.filename_number, \
-                ModelBotDownloaderKtvItem.filename_date == item.filename_date, \
-                ModelBotDownloaderKtvItem.id < item.id)
+                ModelBotDownloaderKtvItem.filename_date == item.filename_date)#, \
+                #ModelBotDownloaderKtvItem.id < item.id)
                 # 20-01-31
                 # 지연.. 이 후 1080 받음.. 이전데이터는 없기 때문에 받아버림.
                 #ModelBotDownloaderKtvItem.id < item.id)
