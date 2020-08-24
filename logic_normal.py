@@ -154,9 +154,9 @@ class LogicNormal(object):
                         if item.daum_genre is None:
                             item.download_status = 'False_no_meta'
                         else:
-                            LogicNormal.search_plex_data(item)
                             # PLEX
                             if ModelSetting.get_bool('use_plex_data'):
+                                LogicNormal.search_plex_data(item)
                                 flag_download = LogicNormal.condition_check_plex(item)
 
                             if not flag_download and not item.download_status.startswith('False'):
@@ -338,7 +338,8 @@ class LogicNormal(object):
             query = query.filter( \
                 ModelBotDownloaderKtvItem.daum_id == item.daum_id, \
                 ModelBotDownloaderKtvItem.filename_number == item.filename_number, \
-                ModelBotDownloaderKtvItem.filename_date == item.filename_date)#, \
+                ModelBotDownloaderKtvItem.filename_date == item.filename_date, \
+                ModelBotDownloaderKtvItem.id != item.id)
                 #ModelBotDownloaderKtvItem.id < item.id)
                 # 20-01-31
                 # 지연.. 이 후 1080 받음.. 이전데이터는 없기 때문에 받아버림.
