@@ -383,7 +383,7 @@ class ModelBotDownloaderKtvItem(db.Model):
             
             if entity is not None:
                 #logger.debug(entity)
-                if entity.folderid != '':
+                if entity.folderid is not None:
                     return True
                 entity.folderid = data['folderid']
                 entity.folderid_time = datetime.now()
