@@ -17,6 +17,12 @@
             <option value="by_plex_on">PLEX 프로그램⭕</option>
             <option value="by_plex_off">PLEX 프로그램❌</option>
             <option value="by_plex_episode_off">PLEX 에피소드❌</option>
+            <!--<option value="torrent_incomplted">다운로드 요청 - 미완료</option>
+            <option value="torrent_completed">다운로드 요청 - 완료</option>-->
+            <option value="share_received">구드공 수신</option>
+            <option value="share_no_received">구드공 미수신</option>
+            <option value="share_request_incompleted">구드공 요청 - 미완료</option>
+            <option value="share_request_completed">구드공 요청 - 완료</option>
           </select>
         </span>
         <span class="col-md-8">
@@ -40,22 +46,23 @@
 </div>
 
 <script type="text/javascript">
-var package_name = "{{arg['package_name'] }}";
+var package_name = "{{arg['package_name']}}";
+var sub = "{{arg['sub']}}";
 var current_data = null;
 var is_torrent_info_installed = ("{{arg['is_torrent_info_installed']}}" == 'True')
 
 $(document).ready(function(){
-  request_search('1');
+  global_sub_request_search('1');
 });
 
 $("#search").click(function(e) {
   e.preventDefault();
-  request_search('1');
+  global_sub_request_search('1');
 });
 
 $("body").on('click', '#page', function(e){
   e.preventDefault();
-  request_search($(this).data('page'));
+  global_sub_request_search($(this).data('page'));
 });
 
 $("#reset_btn").click(function(e) {
@@ -63,7 +70,7 @@ $("#reset_btn").click(function(e) {
   document.getElementById("order").value = 'desc';
   document.getElementById("option").value = 'all';
   document.getElementById("search_word").value = '';
-  request_search('1')
+  global_sub_request_search('1')
 });
 
 $("body").on('click', '#json_btn', function(e){
@@ -80,14 +87,14 @@ $("body").on('click', '#self_search_btn', function(e){
   e.preventDefault();
   var search_word = $(this).data('id');
   document.getElementById("search_word").value = search_word;
-  request_search('1')
+  global_sub_request_search('1')
 });
 
 $("body").on('click', '#except_program_btn', function(e){
   e.preventDefault();
   var program = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/add_program',
+    url: '/'+package_name+'/ajax/' + sub + '/add_program',
     type: "POST", 
     cache: false,
     data: {except_program:program},
@@ -102,7 +109,7 @@ $("body").on('click', '#whitelist_program_btn', function(e){
   e.preventDefault();
   var program = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/add_program',
+    url: '/'+package_name+'/ajax/' + sub + '/add_program',
     type: "POST", 
     cache: false,
     data: {whitelist_program:program},
@@ -117,7 +124,7 @@ $("body").on('click', '#add_download_btn', function(e) {
   e.preventDefault();
   id = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/add_download',
+    url: '/'+package_name+'/ajax/' + sub + '/add_download',
     type: "POST", 
     cache: false,
     data: {id:id},
@@ -127,7 +134,7 @@ $("body").on('click', '#add_download_btn', function(e) {
         $.notify('<strong>다운로드 추가하였습니다.</strong>', {
           type: 'success'
         });
-        request_search(current_data.paging.current_page, false)
+        global_sub_request_search(current_data.paging.current_page, false)
       } else {
         $.notify('<strong>다운로드 추가에 실패하였습니다.</strong>', {
           type: 'warning'
@@ -142,7 +149,7 @@ $("body").on('click', '#share_copy_btn', function(e) {
   e.preventDefault();
   id = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/share_copy',
+    url: '/'+package_name+'/ajax/' + sub + '/share_copy',
     type: "POST", 
     cache: false,
     data: {id:id},
@@ -150,10 +157,9 @@ $("body").on('click', '#share_copy_btn', function(e) {
     success: function (data) {
       if (data.ret == 'success') {
         //command_modal_show('');
+        $.notify('<strong>복사 요청을 했습니다.</strong>', {type: 'success'});
       } else {
-        $.notify('<strong>'+data.log+'</strong>', {
-          type: 'warning'
-        });
+        $.notify('<strong>'+data.log+'</strong>', {type: 'warning'});
       }
     }
   });
@@ -164,7 +170,7 @@ $("body").on('click', '#plex_refresh_btn', function(e) {
   e.preventDefault();
   id = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/plex_refresh',
+    url: '/'+package_name+'/ajax/' + sub + '/plex_refresh',
     type: "POST", 
     cache: false,
     data: {id:id},
@@ -174,7 +180,7 @@ $("body").on('click', '#plex_refresh_btn', function(e) {
         $.notify('<strong>변경되었습니다.</strong>', {
           type: 'success'
         });
-        request_search(current_data.paging.current_page, false)
+        global_sub_request_search(current_data.paging.current_page, false)
       } else {
         $.notify('<strong>변경되지 않았습니다.</strong>', {
           type: 'warning'
@@ -188,7 +194,7 @@ $("body").on('click', '#remove_btn', function(e) {
   e.preventDefault();
   id = $(this).data('id');
   $.ajax({
-    url: '/'+package_name+'/ajax/remove',
+    url: '/'+package_name+'/ajax/' + sub + '/remove',
     type: "POST", 
     cache: false,
     data: {id:id},
@@ -198,7 +204,7 @@ $("body").on('click', '#remove_btn', function(e) {
         $.notify('<strong>삭제되었습니다.</strong>', {
           type: 'success'
         });
-        request_search(current_data.paging.current_page, false)
+        global_sub_request_search(current_data.paging.current_page, false)
       } else {
         $.notify('<strong>삭제 실패</strong>', {
           type: 'warning'
@@ -208,25 +214,6 @@ $("body").on('click', '#remove_btn', function(e) {
   });
 });
 
-
-function request_search(page, move_top=true) {
-  var formData = get_formdata('#form_search')
-  formData += '&page=' + page;
-  $.ajax({
-    url: '/' + package_name + '/ajax/list',
-    type: "POST", 
-    cache: false,
-    data: formData,
-    dataType: "json",
-    success: function (data) {
-      current_data = data;
-      if (move_top)
-        window.scrollTo(0,0);
-      make_list(data.list)
-      make_page_html(data.paging)
-    }
-  });
-}
 
 function except_result_process(data) {
   if ( data == 1) {
@@ -324,6 +311,10 @@ function make_list(data) {
       tmp += '단어 제외 조건'
     } else if (data[i].download_status == 'True_gdrive_share') {
       tmp += '구글 드라이브 공유'
+    } else if (data[i].download_status == 'True_gdrive_share_gc') {
+      tmp += '구글 드라이브 공유(gclone)'
+    } else if (data[i].download_status == 'True_gdrive_share_completed') {
+      tmp += '구글 드라이브 공유 완료'
     } else {
       tmp += data[i].download_status
     }
@@ -373,6 +364,9 @@ function make_list(data) {
     }
     if (data[i].share_copy_time != null) {
       tmp += '<br>' + data[i].share_copy_time + ' (구드공 요청)'
+    }
+    if (data[i].share_copy_completed_time != null) {
+      tmp += '<br>' + data[i].share_copy_completed_time + ' (구드공 완료)'
     }
     if (data[i].downloader_item != null) {
       tmp += '<br>' + data[i].downloader_item.created_time + ' (다운로드 요청)'
@@ -426,7 +420,7 @@ $("body").on('click', '#torrent_info_btn', function(e) {
   e.preventDefault();
   hash = $(this).data('hash');
   $.ajax({
-    url: '/'+package_name+'/ajax/torrent_info',
+    url: '/'+package_name+'/ajax/' + sub + '/torrent_info',
     type: "POST", 
     cache: false,
     data: {hash:hash},

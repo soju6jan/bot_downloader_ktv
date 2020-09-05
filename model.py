@@ -2,7 +2,7 @@
 #########################################################
 # python
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -16,101 +16,16 @@ from framework.util import Util
 
 
 # 패키지
-from .plugin import logger, package_name
-from downloader import ModelDownloaderItem
-
-app.config['SQLALCHEMY_BINDS'][package_name] = 'sqlite:///%s' % (os.path.join(path_app_root, 'data', 'db', '%s.db' % package_name))
+from .plugin import P
+logger = P.logger
+ModelSetting = P.ModelSetting
 #########################################################
         
-class ModelSetting(db.Model):
-    __tablename__ = '%s_setting' % package_name
-    __table_args__ = {'mysql_collate': 'utf8_general_ci'}
-    __bind_key__ = package_name
-
-    id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(100), unique=True, nullable=False)
-    value = db.Column(db.String, nullable=False)
- 
-    def __init__(self, key, value):
-        self.key = key
-        self.value = value
-
-    def __repr__(self):
-        return repr(self.as_dict())
-
-    def as_dict(self):
-        return {x.name: getattr(self, x.name) for x in self.__table__.columns}
-
-    @staticmethod
-    def get(key):
-        try:
-            return db.session.query(ModelSetting).filter_by(key=key).first().value.strip()
-        except Exception as e:
-            logger.error('Exception:%s %s', e, key)
-            logger.error(traceback.format_exc())
-            
-    
-    @staticmethod
-    def get_int(key):
-        try:
-            return int(ModelSetting.get(key))
-        except Exception as e:
-            logger.error('Exception:%s %s', e, key)
-            logger.error(traceback.format_exc())
-    
-    @staticmethod
-    def get_bool(key):
-        try:
-            return (ModelSetting.get(key) == 'True')
-        except Exception as e:
-            logger.error('Exception:%s %s', e, key)
-            logger.error(traceback.format_exc())
-
-    @staticmethod
-    def set(key, value):
-        try:
-            item = db.session.query(ModelSetting).filter_by(key=key).with_for_update().first()
-            if item is not None:
-                item.value = value.strip()
-                db.session.commit()
-            else:
-                db.session.add(ModelSetting(key, value.strip()))
-        except Exception as e:
-            logger.error('Exception:%s %s', e, key)
-            logger.error(traceback.format_exc())
-
-    @staticmethod
-    def to_dict():
-        try:
-            from framework.util import Util
-            return Util.db_list_to_dict(db.session.query(ModelSetting).all())
-        except Exception as e:
-            logger.error('Exception:%s %s', e, key)
-            logger.error(traceback.format_exc())
-
-
-    @staticmethod
-    def setting_save(req):
-        try:
-            for key, value in req.form.items():
-                if key in ['scheduler', 'is_running']:
-                    continue
-                logger.debug('Key:%s Value:%s', key, value)
-                entity = db.session.query(ModelSetting).filter_by(key=key).with_for_update().first()
-                entity.value = value
-            db.session.commit()
-            return True                  
-        except Exception as e: 
-            logger.error('Exception:%s', e)
-            logger.error(traceback.format_exc())
-            logger.debug('Error Key:%s Value:%s', key, value)
-            return False
-
 
 class ModelBotDownloaderKtvItem(db.Model):
-    __tablename__ = '%s_item' % package_name 
+    __tablename__ = '%s_item' % (P.package_name)
     __table_args__ = {'mysql_collate': 'utf8_general_ci'}
-    __bind_key__ = package_name
+    __bind_key__ = P.package_name
 
     id = db.Column(db.Integer, primary_key=True)
     created_time = db.Column(db.DateTime)
@@ -156,14 +71,10 @@ class ModelBotDownloaderKtvItem(db.Model):
 
     # 3 버전 추가
     server_id = db.Column(db.Integer)
-    
-    # 3 버전 추가
-    folderid = db.Column(db.String)
-
-    # 4 버전 추가
-    folderid_time = db.Column(db.DateTime)
-    # 5 버전 추가
-    share_copy_time = db.Column(db.DateTime)
+    folderid = db.Column(db.String) # 3 버전 추가
+    folderid_time = db.Column(db.DateTime) # 4 버전 추가
+    share_copy_time = db.Column(db.DateTime) # 5 버전 추가
+    share_copy_completed_time = db.Column(db.DateTime) # 6
 
     def __init__(self):
         self.created_time = datetime.now()
@@ -180,6 +91,7 @@ class ModelBotDownloaderKtvItem(db.Model):
         ret['downloader_item'] = self.downloader_item.as_dict() if self.downloader_item is not None else None
         ret['folderid_time'] = self.folderid_time.strftime('%m-%d %H:%M:%S') if self.folderid_time is not None  else None
         ret['share_copy_time'] = self.share_copy_time.strftime('%m-%d %H:%M:%S') if self.share_copy_time is not None  else None
+        ret['share_copy_completed_time'] = self.share_copy_completed_time.strftime('%m-%d %H:%M:%S') if self.share_copy_completed_time is not None  else None
         return ret
     
     def save(self):
@@ -238,20 +150,6 @@ class ModelBotDownloaderKtvItem(db.Model):
         except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())   
-
-    @staticmethod
-    def make_etc_genre():
-        try:
-            items = db.session.query(ModelBotDownloaderKtvItem).filter(ModelBotDownloaderKtvItem.daum_genre == None).with_for_update().all()
-            logger.debug('Empty genre len :%s', len(items))
-            for item in items:
-                item.daum_genre = u'미분류'
-            db.session.commit()
-            return True
-        except Exception as e:
-            logger.error('Exception:%s', e)
-            logger.error(traceback.format_exc())   
-        return False
 
     @staticmethod
     def filelist(req):
@@ -315,7 +213,6 @@ class ModelBotDownloaderKtvItem(db.Model):
             else:
                 query = query.filter(or_(ModelBotDownloaderKtvItem.daum_genre.like('%'+genre+'%'), ModelBotDownloaderKtvItem.daum_genre == genre))
 
-        
         if option == 'request_True':
             query = query.filter(ModelBotDownloaderKtvItem.download_status.like('True%'))
         elif option == 'request_False':
@@ -327,6 +224,22 @@ class ModelBotDownloaderKtvItem(db.Model):
         elif option == 'by_plex_episode_off':
             query = query.filter(ModelBotDownloaderKtvItem.plex_key != None)
             query = query.filter(not_(ModelBotDownloaderKtvItem.plex_key.like('E%')))
+        #실패. 아래 동작 안함.
+        #elif option == 'torrent_incomplted':
+        #    query = query.filter(ModelBotDownloaderKtvItem.downloader_item_id != None)
+        #elif option == 'torrent_completed':
+        #    from downloader.model import ModelDownloaderItem
+        #    query = query.filter(ModelBotDownloaderKtvItem.downloader_item_id != None).filter(ModelBotDownloaderKtvItem.downloader_item_id == ModelDownloaderItem.id).filter(ModelDownloaderItem.completed_time != None)
+        elif option == 'share_received':
+            query = query.filter(ModelBotDownloaderKtvItem.folderid != None)
+        elif option == 'share_no_received':
+            query = query.filter(ModelBotDownloaderKtvItem.folderid == None)
+        elif option == 'share_request_incompleted':
+            query = query.filter(ModelBotDownloaderKtvItem.share_copy_time != None).filter(ModelBotDownloaderKtvItem.share_copy_completed_time == None)
+        elif option == 'share_request_completed':
+            query = query.filter(ModelBotDownloaderKtvItem.share_copy_time != None).filter(ModelBotDownloaderKtvItem.share_copy_completed_time != None)
+
+        
         if order == 'desc':
             query = query.order_by(desc(ModelBotDownloaderKtvItem.id))
         else:
@@ -388,8 +301,8 @@ class ModelBotDownloaderKtvItem(db.Model):
                 entity.folderid = data['folderid']
                 entity.folderid_time = datetime.now()
                 db.session.commit()
-                from .logic_normal import LogicNormal
-                LogicNormal.process_gd(entity)
+                module = P.logic.get_module('torrent')
+                module.process_gd(entity)
                 return True
             return False
         except Exception as e: 
@@ -397,3 +310,26 @@ class ModelBotDownloaderKtvItem(db.Model):
             logger.error(traceback.format_exc())
             return False
     
+    @classmethod
+    def get_by_id(cls, id):
+        return db.session.query(cls).filter_by(id=id).first()
+    
+    @classmethod
+    def set_gdrive_share_completed(cls, id):
+        entity = cls.get_by_id(id)
+        if entity is not None:
+            entity.share_copy_completed_time = datetime.now()
+            entity.download_status = 'True_gdrive_share_completed'
+            entity.save()
+            logger.debug('True_gdrive_share_completed %s', id)
+
+    @classmethod
+    def get_share_incompleted_list(cls):
+        #수동인 True_manual_gdrive_share과 분리 \
+        #.filter(cls.download_status == 'True_gdrive_share')  \
+        #.filter(cls.share_copy_completed_time != None)
+        query = db.session.query(cls) \
+            .filter(cls.share_copy_time != None).filter() \
+            .filter(cls.share_copy_time > datetime.now() + timedelta(days=-1)) \
+            .filter(cls.share_copy_completed_time == None)
+        return query.all()
