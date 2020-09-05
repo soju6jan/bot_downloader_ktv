@@ -72,8 +72,8 @@ class LogicTorrentKTV(LogicModuleBase):
         arg = P.ModelSetting.to_dict()
         arg['sub'] = self.name
         if sub == 'setting':
-            arg['scheduler'] = str(scheduler.is_include(package_name))
-            arg['is_running'] = str(scheduler.is_running(package_name))
+            arg['scheduler'] = str(scheduler.is_include(self.get_scheduler_name()))
+            arg['is_running'] = str(scheduler.is_running(self.get_scheduler_name()))
             ddns = SystemModelSetting.get('ddns')
             arg['rss_api'] = '%s/%s/api/%s/rss' % (ddns, package_name, self.name)
             if SystemModelSetting.get_bool('auth_use_apikey'):
@@ -190,6 +190,13 @@ class LogicTorrentKTV(LogicModuleBase):
         except Exception, e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
+    
+    def plugin_load(self):
+        if ModelSetting.get_bool('auto_start'):
+            self.P.logic.scheduler_start(self.name)
+
+    def get_scheduler_interval(self):
+        return self.P.ModelSetting.get('interval')
     #########################################################
     
     
