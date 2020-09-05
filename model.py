@@ -14,6 +14,7 @@ from sqlalchemy.orm import backref
 from framework import app, db, path_app_root
 from framework.util import Util
 
+from downloader import ModelDownloaderItem
 
 # 패키지
 from .plugin import P
