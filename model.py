@@ -14,8 +14,10 @@ from sqlalchemy.orm import backref
 from framework import app, db, path_app_root
 from framework.util import Util
 
+#################################################
+# 18 아래 join에서 사용하기때문에 반드시 먼저 import 되어야함.. 까먹지 말것
 from downloader import ModelDownloaderItem
-
+############################################
 # 패키지
 from .plugin import P
 logger = P.logger
