@@ -245,7 +245,7 @@ class LogicTorrentKTV(LogicModuleBase):
                     flag_download = False
                     item.download_status = ''
                     item.downloader_item_id = None
-                    item.log = ''
+                    item.log = u''
                     logger.debug('title:%s daum:%s date:%s no:%s', item.daum_title, item.daum_id, item.filename_date, item.filename_number) 
                     option_auto_download = ModelSetting.get('option_auto_download')
 
@@ -611,7 +611,7 @@ class LogicTorrentKTV(LogicModuleBase):
             # off, on, 화질 향상시
             condition_duplicate_download = ModelSetting.get('condition_duplicate_download')
             if condition_duplicate_download == '1':
-                item.log += '\n중복 허용 - 다운:On'
+                item.log += u'\n중복 허용 - 다운:On'
                 return True
             query = db.session.query(ModelBotDownloaderKtvItem)
             query = query.filter( \
@@ -625,10 +625,10 @@ class LogicTorrentKTV(LogicModuleBase):
                 #ModelBotDownloaderKtvItem.id < item.id)
             lists = query.all()
             if len(lists) == 0:
-                item.log += '\n중복 에피소드 DB에 없음.'
+                item.log += u'\n중복 에피소드 DB에 없음.'
                 return True
             else:
-                item.log += '\n중복 에피소드 DB에 있음. count:%s' % len(lists)
+                item.log += u'\n중복 에피소드 DB에 있음. count:%s' % len(lists)
             if condition_duplicate_download == '0':
                 for tmp in lists:
                     #if tmp.downloader_item_id is not None:

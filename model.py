@@ -96,6 +96,8 @@ class ModelBotDownloaderKtvItem(db.Model):
     
     def save(self):
         try:
+            if self.log is not None:
+                self.log = u'%s' % self.log
             db.session.add(self)
             db.session.commit()
         except Exception as e: 
