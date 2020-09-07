@@ -558,10 +558,10 @@ class LogicTorrentKTV(LogicModuleBase):
     
     def condition_check_download_mode(self, item, except_genres, whitelist_genres, except_programs, whitelist_programs):
         try:
-            if item.daum_title is None:
-                return True
             if ModelSetting.get('download_mode') == '0':
                 flag_download = True
+                if item.daum_title is None:
+                    return flag_download
                 if len(except_genres) > 0 and item.daum_genre in except_genres:
                     flag_download = False
                     item.download_status = 'False_except_genre'
@@ -577,8 +577,8 @@ class LogicTorrentKTV(LogicModuleBase):
                             break
             else:
                 flag_download = False
-                #logger.debug(whitelist_genres)
-                #logger.debug(item.daum_genre)
+                if item.daum_title is None:
+                    return flag_download
                 if len(whitelist_genres) > 0 and item.daum_genre in whitelist_genres:
                     flag_download = True
                     item.download_status = 'True_whitelist_genre'
