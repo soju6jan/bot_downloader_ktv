@@ -18,13 +18,16 @@ class P(object):
     menu = {
         'main' : [package_name, '봇 다운로드 - TV'],
         'sub' : [
-            ['torrent', '토렌트'], ['log', '로그']
+            ['torrent', '토렌트'], ['vod', 'VOD'], ['log', '로그']
         ], 
         'category' : 'torrent',
         'sub2' : {
             'torrent' : [
                 ['setting', '설정'], ['list', '목록']
             ],
+            'vod' : [
+                ['setting', '설정'], ['list', '목록']
+            ]
         }
     }  
     plugin_info = {
@@ -40,6 +43,9 @@ class P(object):
     logic = None
     module_list = None
     home_module = 'torrent'
+    
+    
+
 
 def initialize():
     try:
@@ -49,6 +55,11 @@ def initialize():
         ###############################################
         from .logic_torrent_ktv import LogicTorrentKTV
         P.module_list = [LogicTorrentKTV(P)]
+        if app.config['config']['level'] < 5:
+            del P.menu['sub'][1]
+        else:
+            from .logic_vod import LogicVod
+            P.module_list.append(LogicVod(P))
         ###############################################
         P.logic = Logic(P)
         default_route(P)

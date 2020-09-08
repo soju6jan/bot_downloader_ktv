@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+  <form id="form_search" class="form-inline" style="text-align:left">
+    <div class="container-fluid">
+      <div class="row show-grid">
+        <span class="col-md-4">
+          <select id="order" name="order" class="form-control form-control-sm">
+            <option value="desc">최근순</option>
+            <option value="asc">오래된순</option>
+          </select>
+          <select id="option" name="option" class="form-control form-control-sm">
+            <option value="all">전체</option>
+            <option value="request_true">복사요청 ⭕</option>
+            <option value="request_false">복사요청 ❌</option>
+          </select>
+        </span>
+        <span class="col-md-8">
+          <input id="search_word" name="search_word" class="form-control form-control-sm w-75" type="text" aria-label="Search">
+          <button id="search" class="btn btn-sm btn-outline-success">검색</button>
+          <button id="reset_btn" class="btn btn-sm btn-outline-success">리셋</button>
+        </span>
+      </div>
+    </div>
+  </form>
+  <div id='page1'></div>
+  {{ macros.m_hr_head_top() }}
+  {{ macros.m_row_start('0') }}
+  {{ macros.m_col(2,  macros.m_strong('Poster')) }}
+  {{ macros.m_col(10,  macros.m_strong('Info')) }}
+  {{ macros.m_row_end() }}
+  {{ macros.m_hr_head_bottom() }}
+  <div id="list_div"></div>
+  <div id='page2'></div>
+</div>
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name']}}";
+var sub = "{{arg['sub']}}";
+var current_data = null;
+
+$(document).ready(function(){
+  global_sub_request_search('1');
+});
+
+$("#search").click(function(e) {
+  e.preventDefault();
+  global_sub_request_search('1');
+});
+
+$("body").on('click', '#page', function(e){
+  e.preventDefault();
+  global_sub_request_search($(this).data('page'));
+});
+
+$("#reset_btn").click(function(e) {
+  e.preventDefault();
+  document.getElementById("order").value = 'desc';
+  document.getElementById("option").value = 'all';
+  document.getElementById("search_word").value = '';
+  global_sub_request_search('1')
+});
+
+$("body").on('click', '#json_btn', function(e){
+  e.preventDefault();
+  var id = $(this).data('id');
+  for (i in current_data.list) {
+    if (current_data.list[i].id == id) {
+      m_modal(current_data.list[i])
+    }
+  }
+});
+
+$("body").on('click', '#self_search_btn', function(e){
+  e.preventDefault();
+  var search_word = $(this).data('id');
+  document.getElementById("search_word").value = search_word;
+  global_sub_request_search('1')
+});
+
+$("body").on('click', '#blacklist_genre_btn', function(e){
+  e.preventDefault();
+  option_process('blacklist_genre', $(this).data('id'));
+});
+
+$("body").on('click', '#whitelist_genre_btn', function(e){
+  e.preventDefault();
+  option_process('whitelist_genre', $(this).data('id'));
+});
+
+$("body").on('click', '#blacklist_program_btn', function(e){
+  e.preventDefault();
+  option_process('blacklist_program', $(this).data('id'));
+});
+
+$("body").on('click', '#whitelist_program_btn', function(e){
+  e.preventDefault();
+  option_process('whitelist_program', $(this).data('id'));
+});
+
+function option_process(mode, value) {
+  $.ajax({
+    url: '/'+package_name+'/ajax/' + sub + '/option_process',
+    type: "POST", 
+    cache: false,
+    data: {mode:mode, value:value},
+    dataType: "json",
+    success: function (data) {
+      if (data == 'success') $.notify('<strong>추가하였습니다.</strong>', {type: 'success'});
+      else if (data == 'already') $.notify('<strong>이미 설정되어 있습니다.</strong>', {type: 'warning'});
+      else $.notify('<strong>실패</strong>', {type: 'warning'});
+    }
+  });
+}
+
+$("body").on('click', '#share_copy_btn', function(e) {
+  e.preventDefault();
+  id = $(this).data('id');
+  $.ajax({
+    url: '/'+package_name+'/ajax/' + sub + '/share_copy',
+    type: "POST", 
+    cache: false,
+    data: {id:id},
+    dataType: "json",
+    success: function (data) {
+      if (data == 'request') {
+        $.notify('<strong>복사 요청을 했습니다.</strong>', {type: 'success'});
+        global_sub_request_search(current_data.paging.current_page, false)
+      } else if (data == 'no_remote_path') {
+        $.notify('<strong>리모트 경로 정보가 없습니다.</strong>', {type: 'warning'});
+      } else if (data == 'no_gd_share_client') {
+        $.notify('<strong>구글 드라이브 공유 플러그인이 설치되어 있지 않습니다.</strong>', {type: 'warning'});
+      } else if (data == 'no_remote_path') {
+        $.notify('<strong>실패</strong>', {type: 'warning'});
+      }
+    }
+  });
+});
+
+function make_list(data) {
+  str = '';
+  for (i in data) {
+    //console.log(data[i])
+    str += m_row_start();
+    tmp = '';
+    if ( data[i].daum_poster_url != null)
+      tmp = '<img src="' + data[i].daum_poster_url + '" class="img-fluid">';
+    str += m_col(2, tmp);
+    right = m_row_start();
+    tmp = '';
+    tmp += '<br><b>파일 :' + data[i].filename + '</b>';
+    if (data[i].daum_title != null) {
+      tmp += '<br><b>방송 : </b>' + '<a href="https://search.daum.net/search?w=tv&q='+data[i].daum_title+'&irk='+data[i].daum_id+'&irt=tv-program&DA=TVP">'+ data[i].daum_title + '</a>' + '(' + data[i].daum_genre + ')'
+      if (data[i].filename_number != -1) {
+        tmp += ', ' + data[i].filename_number + '회'
+      }
+      tmp += ', ' + data[i].filename_date
+    } else {
+      tmp += '<br><b>방송 : </b>검색 실패'
+    }
+    if ( data[i].log != '' && data[i].log != null) {
+      tmp += '<br><b>로그</b><br><pre>'+ data[i].log + '</pre>'
+    }
+    right += m_col(6, tmp);
+
+    tmp = ''
+    right += m_col(3, tmp);
+    tmp = data[i].created_time + ' (텔레그램 수신)';
+    if (data[i].share_request_time != null) {
+      tmp += '<br>' + data[i].share_request_time + ' (구드공 요청)';
+    }
+    if (data[i].share_copy_completed_time != null) {
+      tmp += '<br>' + data[i].share_completed_time + ' (구드공 완료)'
+    }
+    right += m_col(3, tmp);
+    right += m_row_end();
+    right += m_row_start();
+    
+    tmp = ''
+    tmp += m_button2('share_copy_btn', '구글 드라이브 공유 복사',  [{'key':'id', 'value':data[i].id}], 'danger');
+    tmp += m_button('json_btn', 'JSON', [{'key':'id', 'value':data[i].id}]);
+    tmp += m_button('self_search_btn', '목록 검색', [{'key':'id', 'value':data[i].daum_title}]);
+    tmp += m_button('blacklist_genre_btn', '제외 장르 추가', [{'key':'id', 'value':data[i].daum_genre}]);
+    tmp += m_button('whitelist_genre_btn', '포함 장르 추가', [{'key':'id', 'value':data[i].daum_genre}]);
+    tmp += m_button('blacklist_program_btn', '제외 프로그램 추가', [{'key':'id', 'value':data[i].daum_title}]);
+    tmp += m_button('whitelist_program_btn', '포함 프로그램 추가', [{'key':'id', 'value':data[i].daum_title}]);
+    tmp = m_button_group(tmp)
+    right += m_col(12, tmp)
+    right += m_row_end();
+    str += m_col(10, right)
+    str += m_row_end();
+    if (i != data.length -1) str += m_hr();
+  }
+  document.getElementById("list_div").innerHTML = str;
+}
+</script>    
+{% endblock %}

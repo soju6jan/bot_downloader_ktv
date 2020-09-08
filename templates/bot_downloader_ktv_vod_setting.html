@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+  {{ macros.m_button_group([['global_setting_save_btn', '설정 저장']])}}
+  {{ macros.m_row_start('5') }}
+  {{ macros.m_row_end() }}
+  <nav>  
+    {{ macros.m_tab_head_start() }}
+      {{ macros.m_tab_head2('normal', '일반', true) }}
+    {{ macros.m_tab_head_end() }}
+  </nav>
+    <form id='setting' name='setting'>  
+    <div class="tab-content" id="nav-tabContent">
+      {{ macros.m_tab_content_start('normal', true) }}
+        {{ macros.setting_input_text('vod_remote_path', '리모트 경로', value=arg['vod_remote_path'], desc=['구글 드라이브 공유 플러그인이 설치되어 있어야 합니다.']) }}
+        {{ macros.setting_radio('vod_download_mode', '다운로드 모드', ['Nothing', '블랙리스트', '화이트리스트'], value=arg['vod_download_mode']) }}
+        <div id="blacklist_div" class="collapse">
+          {{ macros.setting_input_textarea('vod_blacklist_genre', '제외 장르', value=arg['vod_blacklist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 |']) }}
+          {{ macros.setting_input_textarea('vod_blacklist_program', '제외 프로그램', value=arg['vod_blacklist_program'], row=10, desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드 하지 않습니다. 구분자 |']) }}
+        </div>
+        <div id="whitelist_div" class="collapse">
+          {{ macros.setting_input_textarea('vod_whitelist_genre', '포함 장르', value=arg['vod_whitelist_genre'], row=3, desc=['빈칸인 경우 검사하지 않습니다. 구분자 |']) }}
+          {{ macros.setting_input_textarea('vod_whitelist_program', '포함 프로그램', value=arg['vod_whitelist_program'], row=10, desc=['이 곳에 있는 항목이 프로그램에 이름에 포함되어 있으면 다운로드합니다. 구분자 |']) }}
+        </div>
+      {{ macros.m_tab_content_end() }}
+    </div><!--tab-content-->
+    </form>
+  </div><!--전체-->
+
+<script type="text/javascript">
+var package_name = "{{arg['package_name']}}";
+var sub = "{{arg['sub']}}";
+var vod_download_mode = "{{arg['vod_download_mode']}}";
+
+$(document).ready(function(){
+  set_vod_download_mode(vod_download_mode);
+});
+
+$('input[type=radio][name=vod_download_mode]').change(function() {
+  set_vod_download_mode(this.value);
+});
+
+function set_vod_download_mode(type) {
+  $('input[name=vod_download_mode]')[parseInt(type)].checked = true;
+  if ( type == '1') {
+    $('#blacklist_div').collapse('show');
+    $('#whitelist_div').collapse('hide');
+  } else if ( type == '2') {
+    $('#blacklist_div').collapse('hide');
+    $('#whitelist_div').collapse('show');
+  } else {
+    $('#blacklist_div').collapse('hide');
+    $('#whitelist_div').collapse('hide');
+  }
+}
+</script>    
+{% endblock %}
