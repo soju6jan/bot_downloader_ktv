@@ -27,7 +27,7 @@ class LogicVod(LogicModuleBase):
     }
     
     def __init__(self, P):
-        super(LogicVod, self).__init__(P, 'setting')
+        super(LogicVod, self).__init__(P, 'list')
         self.name = sub_name
 
 
