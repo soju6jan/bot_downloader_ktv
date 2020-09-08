@@ -71,6 +71,7 @@ class LogicVod(LogicModuleBase):
 
 
     def process_telegram_data(self, data, target=None):
+        item = None
         try:
             if target is None:
                 return
