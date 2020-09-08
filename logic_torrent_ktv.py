@@ -169,7 +169,7 @@ class LogicTorrentKTV(LogicModuleBase):
                         msg += '중복 마그넷입니다.'
                         #TelegramHandle.sendMessage(msg)
                     else:
-                        url = '%s/%s/api/%sadd_download?url=%s' % (SystemModelSetting.get('ddns'), package_name, self.name, ret.magnet)
+                        url = '%s/%s/api/%s/add_download?url=%s' % (SystemModelSetting.get('ddns'), package_name, self.name, ret.magnet)
                         if SystemModelSetting.get_bool('auth_use_apikey'):
                             url += '&apikey=%s' % SystemModelSetting.get('auth_apikey')
                         if app.config['config']['is_sjva_server']:
