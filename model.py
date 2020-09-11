@@ -303,7 +303,8 @@ class ModelBotDownloaderKtvItem(db.Model):
                 #logger.debug(entity)
                 if entity.folderid is not None:
                     return True
-                entity.folderid = data['folderid']
+                #entity.folderid = data['folderid']
+                entity.folderid = data['info_json_id']
                 entity.folderid_time = datetime.now()
                 db.session.commit()
                 module = P.logic.get_module('torrent')
