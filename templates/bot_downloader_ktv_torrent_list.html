@@ -156,10 +156,9 @@ $("body").on('click', '#share_copy_btn', function(e) {
     dataType: "json",
     success: function (data) {
       if (data.ret == 'success') {
-        //command_modal_show('');
         $.notify('<strong>복사 요청을 했습니다.</strong>', {type: 'success'});
       } else {
-        $.notify('<strong>'+data.log+'</strong>', {type: 'warning'});
+        $.notify('<strong>'+data.ret+'</strong>', {type: 'warning'});
       }
     }
   });
