@@ -760,7 +760,7 @@ class LogicTorrentKTV(LogicModuleBase):
         except:
             return {'ret':'no_plugin'}
         #ret = LogicUser.copy_with_json(item.folderid, ModelSetting.get('remote_path'))
-        ret = LogicUser.instance.add_copy(item.folderid, item.filename, package_name, '', item.total_size, item.file_count, remote_path=ModelSetting.get('remote_path'))
+        ret = LogicUser.instance.add_copy(item.folderid, item.filename, package_name, item.server_id, item.total_size, item.file_count, remote_path=ModelSetting.get('remote_path'))
         return ret
 
     def share_copy(self, req):
