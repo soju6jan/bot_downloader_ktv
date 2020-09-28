@@ -280,9 +280,7 @@ class LogicTorrentKTV(LogicModuleBase):
                                 if option_auto_download == '1':
                                     if item.folderid is not None and ModelSetting.get('share_receive_option') == '3':
                                         try:
-                                            from gd_share_client.logic_user import LogicUser
-                                            #ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=ModelSetting.get('remote_path'))
-                                            ret = LogicUser.copy_with_json(item.folderid, ModelSetting.get('remote_path'))
+                                            ret = self.add_copy(item)
                                             item.download_status = 'True_gdrive_share'
                                             item.share_copy_time = datetime.datetime.now()
                                         except:
@@ -759,7 +757,6 @@ class LogicTorrentKTV(LogicModuleBase):
             from gd_share_client.logic_user import LogicUser
         except:
             return {'ret':'no_plugin'}
-        #ret = LogicUser.copy_with_json(item.folderid, ModelSetting.get('remote_path'))
         ret = LogicUser.instance.add_copy(item.folderid, item.filename, package_name, item.server_id, item.total_size, item.file_count, remote_path=ModelSetting.get('remote_path'))
         return ret
 
@@ -776,9 +773,6 @@ class LogicTorrentKTV(LogicModuleBase):
             if my_remote_path == '':
                 return {'ret':'fail', 'log':u'리모트 경로가 설정되어 있지 않습니다.'}
             
-            # 백그라운드
-            #ret = LogicUser.torrent_copy(item.folderid, '', '', my_remote_path=my_remote_path, callback=ModelBotDownloaderKtvItem.set_gdrive_share_completed, callback_id=item.id, show_modal=True)
-            #ret = LogicUser.copy_with_json(item.folderid, my_remote_path, show_modal=True)
             ret = self.add_copy(item)
             if ret['ret'] == 'success':
                 item.download_status = 'True_manual_gdrive_share'
@@ -802,7 +796,6 @@ class LogicTorrentKTV(LogicModuleBase):
                 return
             # 2020-08-10 너무 빨리 호출되면 rclone 탐색이 실패하는건가?
             if share_receive_option == '1' or (share_receive_option == '2' and item.download_status == 'True_only_status'):
-                #ret = LogicUser.copy_with_json(item.folderid, my_remote_path)
                 ret = self.add_copy(item)
                 if ret['ret'] == 'success':
                     item.download_status = 'True_gdrive_share'
