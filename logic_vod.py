@@ -149,7 +149,7 @@ class LogicVod(LogicModuleBase):
                 from gd_share_client.logic_user import LogicUser
             except:
                 return 'no_gd_share_client'
-            ret = LogicUser.vod_copy(item.fileid, vod_remote_path)
+            ret = LogicUser.instance.vod_copy(item.fileid, vod_remote_path)
             item.share_request_time = datetime.datetime.now()
             return 'request'
         except Exception as e:
