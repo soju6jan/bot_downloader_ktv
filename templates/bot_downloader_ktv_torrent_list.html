@@ -238,7 +238,7 @@ function make_list(data) {
     if (data[i].download_status == null) data[i].download_status = '';
     str += m_row_start();
     if ( data[i].daum_poster_url != null)
-      tmp = '<img src="' + data[i].daum_poster_url + '" class="img-fluid">'
+      tmp = '<img src="' + data[i].daum_poster_url + '" class="img-fluid rounded">'
     else 
       tmp = ''
     str += m_col(2, tmp);
@@ -320,7 +320,7 @@ function make_list(data) {
     tmp += manual
 
     if (data[i].daum_title != null) {
-      tmp += '<br><b>방송 : </b>' + '<a href="https://search.daum.net/search?w=tv&q='+data[i].daum_title+'&irk='+data[i].daum_id+'&irt=tv-program&DA=TVP">'+ data[i].daum_title + '</a>' + '(' + data[i].daum_genre + ')'
+      tmp += '<br><b>방송 : </b>' + '<a href="https://search.daum.net/search?w=tv&q='+data[i].daum_title+'&irk='+data[i].daum_id+'&irt=tv-program&DA=TVP" target="_blank" rel="noopener noreferrer">'+ data[i].daum_title + '</a>' + '(' + data[i].daum_genre + ')'
       if (data[i].filename_number != -1) {
         tmp += ', ' + data[i].filename_number + '회'
       }
