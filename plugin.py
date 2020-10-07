@@ -15,7 +15,7 @@ class P(object):
     package_name = __name__.split('.')[0]
     logger = get_logger(package_name)
     blueprint = Blueprint(package_name, package_name, url_prefix='/%s' %  package_name, template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
-    menu = {
+    menu = { 
         'main' : [package_name, '봇 다운로드 - TV'],
         'sub' : [
             ['torrent', '토렌트'], ['vod', 'VOD'], ['log', '로그']
