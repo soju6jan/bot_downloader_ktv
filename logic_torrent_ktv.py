@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #########################################################
 # python
-import os, sys, traceback, re, json, threading, urllib, datetime, time
+import os, sys, traceback, re, json, threading, datetime, time
 # third-party
 import requests
 # third-party
 from flask import request, render_template, jsonify, Response
 from sqlalchemy import or_, and_, func, not_, desc
 # sjva 공용
-from framework import app, db, scheduler, path_data, socketio, SystemModelSetting
+from framework import app, db, scheduler, path_data, socketio, SystemModelSetting, py_urllib
 from framework.util import Util
 from framework.common.torrent.process import TorrentProcess
 from framework.common.util import headers, get_json_with_auth_session
@@ -99,7 +99,7 @@ class LogicTorrentKTV(LogicModuleBase):
             try:
                 import plex
                 ret['plex_server_hash'] = plex.Logic.get_server_hash()
-            except Exception, e:
+            except Exception as e:
                 logger.error('not import plex')
             return jsonify(ret)
         elif sub == 'add_program':
@@ -178,7 +178,7 @@ class LogicTorrentKTV(LogicModuleBase):
                             msg += '\n➕ 다운로드 추가\n<%s>\n' % url
                         try:
                             if ret.daum_id is not None:
-                                url = 'https://search.daum.net/search?w=tv&q=%s&irk=%s&irt=tv-program&DA=TVP' % (urllib.quote(ret.daum_title.encode('utf8')), ret.daum_id)
+                                url = 'https://search.daum.net/search?w=tv&q=%s&irk=%s&irt=tv-program&DA=TVP' % (py_urllib.quote(ret.daum_title.encode('utf8')), ret.daum_id)
                                 msg += '\n● Daum 정보\n%s' % url
                         except Exception as e: 
                             logger.error('Exception:%s', e)
@@ -187,7 +187,7 @@ class LogicTorrentKTV(LogicModuleBase):
                     Notify.send_message(msg, image_url=ret.daum_poster_url, message_id='bot_downloader_ktv_receive')
                 self.invoke()
                 TorrentProcess.receive_new_data(ret, package_name)
-        except Exception, e:
+        except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
     
@@ -842,7 +842,7 @@ class LogicTorrentKTV(LogicModuleBase):
                 return True
             else:
                 return False
-        except Exception, e:
+        except Exception as e:
             logger.error('Exception:%s', e)
             logger.error(traceback.format_exc())
 

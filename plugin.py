@@ -16,17 +16,17 @@ class P(object):
     logger = get_logger(package_name)
     blueprint = Blueprint(package_name, package_name, url_prefix='/%s' %  package_name, template_folder=os.path.join(os.path.dirname(__file__), 'templates'))
     menu = { 
-        'main' : [package_name, '봇 다운로드 - TV'],
+        'main' : [package_name, u'봇 다운로드 - TV'],
         'sub' : [
-            ['torrent', '토렌트'], ['vod', 'VOD'], ['log', '로그']
+            ['torrent', u'토렌트'], ['vod', u'VOD'], ['log', u'로그']
         ], 
         'category' : 'torrent',
         'sub2' : {
             'torrent' : [
-                ['setting', '설정'], ['list', '목록']
+                ['setting', u'설정'], ['list', u'목록']
             ],
             'vod' : [
-                ['setting', '설정'], ['list', '목록']
+                ['setting', u'설정'], ['list', u'목록']
             ]
         }
     }  
@@ -35,7 +35,7 @@ class P(object):
         'name' : 'bot_downloader_ktv',
         'category_name' : 'torrent',
         'developer' : 'soju6jan',
-        'description' : '텔레그램 봇으로 수신한 정보로 TV 다운로드',
+        'description' : u'텔레그램 봇으로 수신한 정보로 TV 다운로드',
         'home' : 'https://github.com/soju6jan/bot_downloader_ktv',
         'more' : '',
     }
