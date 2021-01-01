@@ -13,6 +13,8 @@ from framework.util import Util
 from framework.common.torrent.process import TorrentProcess
 from framework.common.util import headers, get_json_with_auth_session
 from framework.common.plugin import LogicModuleBase, FfmpegQueueEntity, FfmpegQueue, default_route_socketio
+from tool_base import ToolBaseNotify
+
 # 패키지
 from .plugin import P
 from .model import ModelBotDownloaderKtvItem
@@ -183,8 +185,7 @@ class LogicTorrentKTV(LogicModuleBase):
                         except Exception as e: 
                             logger.error('Exception:%s', e)
                             logger.error(traceback.format_exc())  
-                    import framework.common.notify as Notify
-                    Notify.send_message(msg, image_url=ret.daum_poster_url, message_id='bot_downloader_ktv_receive')
+                    ToolBaseNotify.send_message(msg, image_url=ret.daum_poster_url, message_id='bot_downloader_ktv_receive')
                 self.invoke()
                 TorrentProcess.receive_new_data(ret, package_name)
         except Exception as e:
@@ -412,8 +413,7 @@ class LogicTorrentKTV(LogicModuleBase):
             #telegram_log += item.download_status + '\n'
             telegram_log += '로그\n' + item.log
 
-            import framework.common.notify as Notify
-            Notify.send_message(telegram_log, message_id='bot_downloader_ktv_result')
+            ToolBaseNotify.send_message(telegram_log, message_id='bot_downloader_ktv_result')
 
         except Exception as e: 
             logger.error('Exception:%s', e)
