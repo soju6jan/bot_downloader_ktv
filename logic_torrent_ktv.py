@@ -198,6 +198,14 @@ class LogicTorrentKTV(LogicModuleBase):
 
     def get_scheduler_interval(self):
         return self.P.ModelSetting.get('interval')
+
+    def reset_db(self):
+        db.session.query(ModelBotDownloaderKtvItem).delete()
+        db.session.commit()
+        ModelSetting.set('last_id', '-1')
+        return True
+
+
     #########################################################
     
     
