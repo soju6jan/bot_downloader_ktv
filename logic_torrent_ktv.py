@@ -10,7 +10,6 @@ from sqlalchemy import or_, and_, func, not_, desc
 # sjva 공용
 from framework import app, db, scheduler, path_data, socketio, SystemModelSetting, py_urllib
 from framework.util import Util
-from framework.common.torrent.process import TorrentProcess
 from framework.common.util import headers, get_json_with_auth_session
 from framework.common.plugin import LogicModuleBase, FfmpegQueueEntity, FfmpegQueue, default_route_socketio
 from tool_base import ToolBaseNotify
@@ -174,7 +173,7 @@ class LogicTorrentKTV(LogicModuleBase):
                         url = '%s/%s/api/%s/add_download?url=%s' % (SystemModelSetting.get('ddns'), package_name, self.name, ret.magnet)
                         if SystemModelSetting.get_bool('auth_use_apikey'):
                             url += '&apikey=%s' % SystemModelSetting.get('auth_apikey')
-                        if app.config['config']['is_sjva_server']:
+                        if app.config['config']['is_server']:
                             msg += '\n' + ret.magnet + '\n'
                         else:
                             msg += '\n➕ 다운로드 추가\n<%s>\n' % url
@@ -187,7 +186,11 @@ class LogicTorrentKTV(LogicModuleBase):
                             logger.error(traceback.format_exc())  
                     ToolBaseNotify.send_message(msg, image_url=ret.daum_poster_url, message_id='bot_downloader_ktv_receive')
                 self.invoke()
-                TorrentProcess.receive_new_data(ret, package_name)
+                try:
+                    if app.config['config']['is_server']:
+                        from tool_expand import TorrentProcess
+                        TorrentProcess.receive_new_data(ret, package_name)
+                except: pass
         except Exception as e:
                 logger.error('Exception:%s', e)
                 logger.error(traceback.format_exc())
