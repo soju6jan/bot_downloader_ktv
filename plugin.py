@@ -55,7 +55,7 @@ def initialize():
         ###############################################
         from .logic_torrent_ktv import LogicTorrentKTV
         P.module_list = [LogicTorrentKTV(P)]
-        if app.config['config']['level'] < 5:
+        if app.config['config']['level'] < 4:
             del P.menu['sub'][1]
         else:
             from .logic_vod import LogicVod
