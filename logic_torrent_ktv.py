@@ -797,7 +797,7 @@ class LogicTorrentKTV(LogicModuleBase):
 
     def process_gd(self, item):
         try:
-            #{{ macros.setting_radio('share_receive_option', '구드공 데이터 활용', ['Nothing', '다운로드 조건에 상관없이 모두 다운로드', '다운로드 조건만 체크 옵션일 경우 조건에 일치하면 즉시 다운로드', '자동 자동로드 모드. 지연시간 이후 다운로드 시도시 구드공 데이터가 있을 경우 구드공으로 다운로드'], value=arg['share_receive_option']) }}
+            #{{ macros.setting_radio('share_receive_option', '구드공 데이터 활용', ['Nothing', '다운로드 조건에 상관없이 모두 다운로드', '다운로드 조건만 체크 옵션일 경우 조건에 일치하면 즉시 다운로드', '자동 다운로드 모드. 지연시간 이후 다운로드 시도시 구드공 데이터가 있을 경우 구드공으로 다운로드'], value=arg['share_receive_option']) }}
             share_receive_option = ModelSetting.get('share_receive_option')
             if share_receive_option == '0':
                 pass
