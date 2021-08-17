@@ -7,7 +7,7 @@ from flask import Blueprint
 from framework import app, path_data, SystemModelSetting
 from framework.logger import get_logger
 from framework.util import Util
-from framework.common.plugin import get_model_setting, Logic, default_route
+from plugin import get_model_setting, Logic, default_route, PluginUtil
 # 패키지
 #########################################################
 
@@ -50,8 +50,7 @@ class P(object):
 def initialize():
     try:
         app.config['SQLALCHEMY_BINDS'][P.package_name] = 'sqlite:///%s' % (os.path.join(path_data, 'db', '{package_name}.db'.format(package_name=P.package_name)))
-        from framework.util import Util
-        Util.save_from_dict_to_json(P.plugin_info, os.path.join(os.path.dirname(__file__), 'info.json'))
+        PluginUtil.make_info_json(P.plugin_info, __file__)
         ###############################################
         from .logic_torrent_ktv import LogicTorrentKTV
         P.module_list = [LogicTorrentKTV(P)]

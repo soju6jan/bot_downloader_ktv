@@ -10,7 +10,7 @@ from sqlalchemy import or_, and_, func, not_, desc
 # sjva 공용
 from framework import app, db, scheduler, path_data, socketio, SystemModelSetting
 from framework.util import Util
-from framework.common.plugin import LogicModuleBase
+from plugin import LogicModuleBase
 # 패키지
 from .plugin import P
 sub_name = 'vod'
